@@ -1,0 +1,20 @@
+{% extends 'templates/base.html' %}
+
+{% block navbar_links %}
+<li class="nav-item">
+    <a class="nav-link" href="https://github.com/fastily/{{title}}">Source</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<header>
+    <div class="container jumbotron mt-4">
+        <h1 class="display-4">{{title}}</h1>
+        <p class="lead">({{desc}})</p>
+    </div>
+</header>
+
+{% block tool %}
+{% endblock %}
+
+{% endblock %}
