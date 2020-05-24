@@ -3,5 +3,5 @@
 
 My serverless Wikipedia JavaScript tools and utilities.
 
-## Implenetation Notes
-The template language is [Jinja](https://github.com/pallets/jinja/).  Built with [Jinja2html](https://github.com/fastily/jinja2html).
+### Implenetation Notes
+The template language is [Jinja](https://github.com/pallets/jinja/), built with [Jinja2html](https://github.com/fastily/jinja2html).
