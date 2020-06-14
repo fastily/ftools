@@ -56,25 +56,18 @@
 				switch (this.selectedAlg) {
 					case 'md5':
 						return CryptoJS.MD5(this.inputText)
-						break;
 					case 'sha1':
 						return CryptoJS.SHA1(this.inputText)
-						break;
 					case 'sha256':
 						return CryptoJS.SHA256(this.inputText)
-						break;
 					case 'sha384':
 						return CryptoJS.SHA384(this.inputText)
-						break;
 					case 'sha512':
 						return CryptoJS.SHA512(this.inputText)
-						break;
 					case 'sha3-512':
 						return CryptoJS.SHA3(this.inputText)
-						break;
 					default:
 						return alert("Invalid option, should never reach here");
-						break;
 				}
 			}
 		}
