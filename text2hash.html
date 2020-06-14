@@ -6,31 +6,31 @@
 {% block tool %}
 {% raw %}
 <section>
-<div class="container" id="app">
-	<form>
-		<div class="form-group">
-			<label for="mainTextInput">First, type the text you want to hash:</label>
-			<textarea class="form-control" rows="3" id="mainTextInput" v-model="inputText"></textarea>
-		</div>
-
-		<div class="form-group">
-			<label for="selectAlgBox">Next, choose your hashing algorithim:</label>
-			<select class="form-control" id="selectAlgBox" v-model="selectedAlg">
-				<option v-for="v in vals" :key="v.name" :value="v.name">{{v.name}} ({{v.type}})</option>
-			</select>
-		</div>
-
-		<hr>
-		<div class="card">
-			<div class="card-header">
-				And here is your result:
+	<div class="container" id="app">
+		<form>
+			<div class="form-group">
+				<label for="mainTextInput">First, type the text you want to hash:</label>
+				<textarea class="form-control" rows="3" id="mainTextInput" v-model="inputText"></textarea>
 			</div>
-			<div class="card-body">
-				{{doHash()}}
+
+			<div class="form-group">
+				<label for="selectAlgBox">Next, choose your hashing algorithim:</label>
+				<select class="form-control" id="selectAlgBox" v-model="selectedAlg">
+					<option v-for="v in vals" :key="v.name" :value="v.name">{{v.name}} ({{v.type}})</option>
+				</select>
 			</div>
-		</div>
-	</form>
-</div>
+
+			<hr>
+			<div class="card">
+				<div class="card-header">
+					And here is your result:
+				</div>
+				<div class="card-body">
+					{{doHash()}}
+				</div>
+			</div>
+		</form>
+	</div>
 </section>
 {% endraw %}
 {% endblock %}
@@ -64,7 +64,7 @@
 						return CryptoJS.SHA256(this.inputText)
 						break;
 					case 'sha384':
-					return CryptoJS.SHA384(this.inputText)
+						return CryptoJS.SHA384(this.inputText)
 						break;
 					case 'sha512':
 						return CryptoJS.SHA512(this.inputText)
