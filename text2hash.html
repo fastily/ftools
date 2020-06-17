@@ -18,6 +18,7 @@
 				<select class="form-control" id="selectAlgBox" v-model="selectedAlg">
 					<option v-for="v in vals" :key="v.name" :value="v.name">{{v.name}} ({{v.type}})</option>
 				</select>
+				<small v-show="selectedAlg == 'keccak-512'" class="text-muted">NB: Past versions of this tool erroneously referred to keccak-512 as sha3-512</small>
 			</div>
 
 			<hr>
@@ -43,9 +44,9 @@
 	new Vue({
 		el: "#app",
 		data: {
-			vals: [{ name: "sha3-512", type: "strong" }, { name: "sha512", type: "strong" }, { name: "sha384", type: "better" }, { name: "sha256", type: "better" },
+			vals: [{ name: "keccak-512", type: "strong" }, { name: "sha512", type: "strong" }, { name: "sha384", type: "better" }, { name: "sha256", type: "better" },
 			{ name: "sha1", type: "weak" }, { name: "md5", type: "weak" }],
-			selectedAlg: "sha3-512",
+			selectedAlg: "sha512",
 			inputText: ""
 		},
 		methods: {
@@ -64,7 +65,7 @@
 						return CryptoJS.SHA384(this.inputText)
 					case 'sha512':
 						return CryptoJS.SHA512(this.inputText)
-					case 'sha3-512':
+					case 'keccak-512':
 						return CryptoJS.SHA3(this.inputText)
 					default:
 						return alert("Invalid option, should never reach here");
