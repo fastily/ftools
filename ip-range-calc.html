@@ -1,7 +1,7 @@
 {% extends 'templates/tool-base.html' %}
 
 {% set title = "ip-range-calc" %}
-{% set desc = "calculate a rangeblock right in your browser" %}
+{% set desc = "calculate a rangeblock in your browser" %}
 
 {% block tool %}
 {% raw %}
@@ -9,26 +9,25 @@
 	<div id="app">
 		<form>
 			<div class="form-group">
-				<label for="mainTextInput">First, list the IP addresses (one per line):</label>
-				<textarea class="form-control" rows="5" id="mainTextInput" v-model.trim="inputText"></textarea>
+				<label for="mainTextInput">List the IP addresses below (one per line):</label>
+				<textarea class="form-control" rows="7" id="mainTextInput" v-model.trim="inputText"></textarea>
 			</div>
 			<div class="form-group">
-				<label for="selectIpType">Next, what kind of IP addresses are these?</label>
+				<label for="selectIpType">What kind of IP addresses are these?</label>
 				<select class="form-control" id="selectIpType" v-model="selectedIPType">
-					<option v-for="ipType in ipTypes" :key="ipType" :value="ipType">IPv{{ipType}}</option>
+					<option v-for="ipType in ['4', '6']" :key="ipType" :value="ipType">IPv{{ipType}}</option>
 				</select>
 			</div>
 
 			<input type="button" value="Calculate!" class="btn btn-primary" v-on:click.prevent="calculate">
 		</form>
 
-		<hr>
-		<div class="card" v-if="showResult">
+		<div class="card mt-4" v-show="showResult">
 			<div class="card-header">Your Result:</div>
 			<div class="card-body">{{resultText}}</div>
 		</div>
 
-		<p class="alert alert-danger mt-2" role="alert" v-if="showBigRangeWarning">MediaWiki prohibits rangeblocks this large. Try experimenting with multiple, smaller ranges.</p>
+		<p class="alert alert-warning mt-2" role="alert" v-if="showBigRangeWarning">⚠️ MediaWiki prohibits rangeblocks this large. Try experimenting with multiple, smaller ranges.</p>
 	</div>
 </section>
 {% endraw %}
@@ -39,10 +38,31 @@
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/ipaddr.js/1.9.1/ipaddr.min.js" crossorigin="anonymous"></script>
 
 <script>
+
+	function binaryFillTop(num, size) {
+		let out = 0;
+		for (i = size - 1; i >= size - num; i--)
+			out += 2 ** i;
+		return out;
+	}
+
+	function normalizeCIDR(addr, cidr, numBits) {
+		let mask = Array(addr.length).fill(0);
+		let fillCnt = Math.floor(cidr / numBits);
+		mask.fill(binaryFillTop(numBits, numBits), 0, fillCnt);
+
+		if (fillCnt < mask.length)
+			mask[fillCnt] = binaryFillTop(cidr % numBits, numBits);
+
+		for (i = 0; i < addr.length; i++)
+			addr[i] &= mask[i];
+
+		return addr;
+	}
+
 	new Vue({
 		el: "#app",
 		data: {
-			ipTypes: ["4", "6"],
 			inputText: "",
 			selectedIPType: "",
 			resultText: "",
@@ -53,26 +73,24 @@
 			calculate() {
 				this.showBigRangeWarning = false;
 
-				if (!this.inputText || !this.selectedIPType) {
-					alert("Error: Please fill out all fields!");
-					return;
-				}
+				if (!this.inputText || !this.selectedIPType)
+					return alert("Error: Please fill out all fields!");
 
-				var protocol;
-				var cnt;
+				let protocol, cnt;
 				if (this.selectedIPType === "4") {
 					protocol = ipaddr.IPv4;
 					cnt = 32;
 				}
-				else {
+				else  // this.selectedIPType === "6"
+				{
 					protocol = ipaddr.IPv6;
 					cnt = 128;
 				}
 
-				var ipL = this.inputText.split("\n");
+				let ipL = this.inputText.split("\n").map(s => s.trim()).filter(ip => ip);
 
 				// validate and parse IP addresses from user input
-				var addrs = [];
+				let addrs = [];
 				for (i = 0; i < ipL.length; i++) {
 					if (!protocol.isValid(ipL[i]))
 						return alert("Error: '" + ipL[i] + "' is not a valid IP address in this context.  Please fix before proceeding");
@@ -90,8 +108,14 @@
 				if (ipaddr.IPv4 === protocol && cnt < 16 || ipaddr.IPv6 === protocol && cnt < 19)
 					this.showBigRangeWarning = true;
 
+				// normalize output
+				if (ipaddr.IPv4 === protocol)
+					this.resultText = ipaddr.fromByteArray(normalizeCIDR(addrs[0].toByteArray(), cnt, 8)).toString() + "/" + cnt;
+				else
+					// normalizeCIDR(addr, cnt, 16); // IPv6 parsing is broken in ip-addr, so retain old behavior
+					this.resultText = addrs[0].toString() + "/" + cnt;
+
 				this.showResult = true;
-				this.resultText = addrs[0].toString() + "/" + cnt;
 			}
 		}
 	});
