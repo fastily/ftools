@@ -12,14 +12,14 @@ j2hRoot="${HOME}/j2h"
 j2hActivate="${j2hRoot}/bin/activate"
 
 if [ ! -d "$j2hRoot" ]; then
-	python3 -m venv "${j2hRoot}"
+	python3 -m venv "$j2hRoot"
 fi
 
-source "${j2hActivate}"
-if ! hash jinja2html > /dev/null; then
+source "$j2hActivate"
+if ! hash jinja2html 2> /dev/null; then
 	pip3 install jinja2html
 fi
 
 cd "${HOME}/ftools"
 jinja2html --generate
-cp -Rf out/* "${HOME}/public_html"/
+cp -Rf out/* "${HOME}/public_html/"

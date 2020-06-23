@@ -112,7 +112,7 @@
 				if (ipaddr.IPv4 === protocol)
 					this.resultText = ipaddr.fromByteArray(normalizeCIDR(addrs[0].toByteArray(), cnt, 8)).toString() + "/" + cnt;
 				else
-					// normalizeCIDR(addr, cnt, 16); // IPv6 parsing is broken in ip-addr, so retain old behavior
+					// normalizeCIDR(addr, cnt, 16); // IPv6 parsing is broken in ipaddr.js, so retain old behavior
 					this.resultText = addrs[0].toString() + "/" + cnt;
 
 				this.showResult = true;
