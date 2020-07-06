@@ -1,0 +1,64 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "ffd2a" %}
+{% set desc = "quickly generate ffd2a templates" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <label for="textInputField">Files</label>
+                <textarea class="form-control" rows="15" id="textInputField" v-model="text"></textarea>
+            </div>
+
+            <input type="button" value="Generate" class="btn btn-primary" v-on:click.prevent="generate">
+        </form>
+
+        <div class="card mt-4" v-show="showResult">
+            <div class="card-header">Your Result:</div>
+            <div class="card-body">
+                <pre>{{result.join("\n")}}</pre>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            text: "",
+            showResult: false,
+            result: []
+        },
+        methods: {
+            generate() {
+                if (!this.text)
+                    return;
+
+                this.result = []
+                
+                for (const f of this.text.split("\n").map(s => s.trim()).filter(s => s)) {
+                    axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=revisions&formatversion=2&rvlimit=1&rvdir=newer&titles=${encodeURIComponent(f)}`)
+                        .then(response => {
+                            const page = response.data.query.pages[0];
+                            this.result.push(`{{subst:Ffd2a|${page.title.substring(5)}|multi=yes|uploader=${page.revisions[0].user}}}`);
+                        });
+                }
+
+                this.showResult = true;
+            }
+        }
+    });
+</script>
+{% endraw %}
+{% endblock %}
