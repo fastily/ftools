@@ -9,18 +9,27 @@
     <div id="app">
         <form>
             <div class="form-group">
-                <label for="textInputField">Files</label>
+                <label for="textInputField">Files to generate <a href="https://en.wikipedia.org/wiki/Template:Ffd2a" target="_blank">Ffd2a</a> listings for</label>
                 <textarea class="form-control" rows="15" id="textInputField" v-model="text"></textarea>
+                <small class="text-muted">One file per line, must start with "File:" prefix and exist on enwp.  Everything else will be ignored.</small>
             </div>
 
-            <input type="button" value="Generate" class="btn btn-primary" v-on:click.prevent="generate">
+            <input type="button" value="Generate" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
+            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-if="isRunning"></span>
         </form>
 
         <div class="card mt-4" v-show="showResult">
-            <div class="card-header">Your Result:</div>
+            <div class="card-header">Result</div>
             <div class="card-body">
-                <pre>{{result.join("\n")}}</pre>
+                <pre>{{result}}</pre>
             </div>
+        </div>
+
+        <div class="alert alert-warning mt-2" role="alert" v-if="errorMessages.length">
+            <p>Warnings</p>
+            <ul>
+                <li v-for="msg in errorMessages" :key="msg">{{msg}}</li>
+            </ul>
         </div>
 
     </div>
@@ -38,24 +47,39 @@
         data: {
             text: "",
             showResult: false,
-            result: []
+            result: "",
+            isRunning: false,
+            errorMessages: []
         },
         methods: {
             generate() {
                 if (!this.text)
                     return;
 
-                this.result = []
-                
-                for (const f of this.text.split("\n").map(s => s.trim()).filter(s => s)) {
-                    axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=revisions&formatversion=2&rvlimit=1&rvdir=newer&titles=${encodeURIComponent(f)}`)
-                        .then(response => {
-                            const page = response.data.query.pages[0];
-                            this.result.push(`{{subst:Ffd2a|${page.title.substring(5)}|multi=yes|uploader=${page.revisions[0].user}}}`);
-                        });
-                }
+                this.isRunning = true;
+                this.result = "";
+                this.errorMessages = [];
 
-                this.showResult = true;
+                const queries = this.text.split("\n").map(s => s.trim()).filter(s => s && s.startsWith("File:")).map(s => axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=revisions&formatversion=2&rvlimit=1&rvdir=newer&titles=${encodeURIComponent(s)}`));
+
+                Promise.all(queries).then(values => {
+                    const results = [];
+                    const errors = [];
+                    for (const response of values)
+                    {
+                        const page = response.data.query.pages[0];
+
+                        if(page.hasOwnProperty("missing"))
+                            errors.push(`${page.title} does not exist, omitting`);
+                        else
+                            results.push(`{{subst:Ffd2a|${page.title.substring(5)}|multi=yes|uploader=${page.revisions[0].user}}}`);
+                    }
+
+                    this.isRunning = false;
+                    this.result = results.join("\n");
+                    this.errorMessages = errors;
+                    this.showResult = true;
+                });
             }
         }
     });

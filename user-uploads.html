@@ -1,0 +1,103 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "user-uploads" %}
+{% set desc = "list all of user's uploads" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <label for="textInputField">User to fetch uploads for (equivalent to <a href="https://en.wikipedia.org/wiki/Special:ListFiles" target="_blank">Special:ListFiles</a>)</label>
+                <input class="form-control" type="text" id="textInputField" v-model="text">
+                <small class="text-muted form-text ">Note: usernames are case-sensitive</small>
+            </div>
+
+
+            <input type="button" value="Fetch" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
+            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-if="isRunning"></span>
+        </form>
+
+        <div class="card mt-4" v-show="showResult">
+            <div class="card-header">Result</div>
+            <div class="card-body">
+                <pre>{{result}}</pre>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
+
+<script>
+    async function makeQuery(user) {
+        const out = [];
+
+        let pl = {
+            action: "query",
+            format: "json",
+            formatversion: "2",
+            origin: "*",
+            list: "allimages",
+            aisort: "timestamp",
+            ailimit: "max",
+            aiuser: user,
+        }
+        let cont = null
+
+        do {
+            if (cont)
+                pl = {
+                    ...pl,
+                    ...cont
+                };
+
+            const response = await axios.get("https://en.wikipedia.org/w/api.php", { params: pl })
+            for (f of response.data.query.allimages)
+                out.push(f.title);
+
+            cont = "continue" in response.data ? response.data.continue : null;
+
+        } while (cont)
+
+        return out;
+    }
+
+
+    new Vue({
+        el: "#app",
+        data: {
+            text: "",
+            showResult: false,
+            result: "",
+            isRunning: false,
+        },
+        methods: {
+            generate() {
+                this.text = this.text.trim();
+
+                if (!this.text)
+                    return;
+                else if (this.text.toLowerCase().startsWith("user:"))
+                    this.text = this.text.substring(5);
+
+                this.isRunning = true;
+                this.result = "";
+
+                makeQuery(this.text).then(l => {
+                    this.result = l.join("\n")
+                    this.isRunning = false;
+                    this.showResult = true;
+                });
+            }
+        }
+    });
+</script>
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "word-count" %}
+{% set desc = "a simple word counter" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+	<div id="app">
+		<form>
+			<div class="form-group">
+				<label for="textInputField">Text to perform a word count on</label>
+				<textarea class="form-control" rows="15" id="textInputField" v-model="text"></textarea>
+			</div>
+		</form>
+
+		<div class="card mt-4">
+			<div class="card-header">Counts</div>
+			<div class="card-body">
+				<ul>
+					<li><strong>Characters</strong>: {{charCount}}</li>
+					<li><strong>Words</strong>: {{wordCount}}</li>
+					<li><strong>Lines</strong>: {{lineCount}}</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</section>
+{% endraw %}
+{% endblock %}
+
+
+{% block scripts %}
+{% raw %}
+<script>
+	new Vue({
+		el: "#app",
+		data: {
+			text: ""
+		},
+		computed: {
+			charCount: function () {
+				return this.text.length;
+			},
+			wordCount: function () {
+				return this.text ? this.text.trim().split(/\s+/).length : 0;
+			},
+			lineCount: function () {
+				return this.text ? this.text.split("\n").length : 0;
+			}
+		}
+	});
+</script>
+{% endraw %}
+{% endblock %}
