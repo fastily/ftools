@@ -1,0 +1,48 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "unique-lines" %}
+{% set desc = "remove duplicate lines from a body of text" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+	<div id="app">
+		<form>
+			<div class="form-group">
+				<label for="textInputField">Lines to process</label>
+                <textarea class="form-control" rows="15" id="textInputField" v-model="text"></textarea>
+                <small class="text-muted form-text">One entry per line</small>
+            </div>
+
+            <input type="button" value="Do it" class="btn btn-primary" v-on:click.prevent="deDupe">
+		</form>
+
+		<div class="card mt-4" v-show="showResult">
+			<div class="card-header">Result</div>
+			<div class="card-body"><pre>{{result}}</pre></div>
+		</div>
+	</div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script>
+	new Vue({
+		el: "#app",
+		data: {
+            text: "",
+            result: "",
+            showResult: false
+		},
+		methods: {
+			deDupe() {
+                this.showResult = true;
+                this.result = Array.from(new Set(this.text.trim().split("\n"))).join("\n");
+			}
+		}
+	});
+</script>
+{% endraw %}
+{% endblock %}

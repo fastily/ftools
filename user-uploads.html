@@ -16,7 +16,7 @@
 
 
             <input type="button" value="Fetch" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
-            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-if="isRunning"></span>
+            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-show="isRunning"></span>
         </form>
 
         <div class="card mt-4" v-show="showResult">
