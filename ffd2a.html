@@ -10,7 +10,7 @@
         <form>
             <div class="form-group">
                 <label for="textInputField">Files to generate <a href="https://en.wikipedia.org/wiki/Template:Ffd2a" target="_blank">Ffd2a</a> listings for</label>
-                <textarea class="form-control" rows="15" id="textInputField" v-model="text"></textarea>
+                <textarea class="form-control" rows="15" id="textInputField" v-model.trim="text"></textarea>
                 <small class="text-muted">One file per line, must start with "File:" prefix and exist on enwp.  Everything else will be ignored.</small>
             </div>
 

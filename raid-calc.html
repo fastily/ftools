@@ -18,20 +18,18 @@
 			<div class="form-row">
 				<div class="form-group col-md-6">
 					<label for="numHDDField">Number of Hard Drives</label>
-					<input id="numHDDField" class="form-control" type="number" v-model="numHDD" min="2">
+					<input id="numHDDField" class="form-control" type="number" v-model.number="numHDD" min="2">
 				</div>
 
 				<div class="form-group col-md-6">
 					<label for="hddSizeField">Hard Drive Size (TB)</label>
-					<input id="hddSizeField" class="form-control" type="number" v-model="hddSize" min="1">
+					<input id="hddSizeField" class="form-control" type="number" v-model.number="hddSize" min="1">
 				</div>
 			</div>
 		</form>
 
 		<div class="card mt-4" v-show="showResult">
-			<div class="card-header">
-				Result
-			</div>
+			<div class="card-header">Result</div>
 			<div class="card-body">
 				{{calc()}}
 			</div>
@@ -58,20 +56,16 @@
 	}
 
 	function calcRAIDMessage(name, minDrives, parityDrives, numHDD, hddSize) {
-		numHDD = parseInt(numHDD, 10);
-		hddSize = parseInt(hddSize, 10);
-
 		if (minDrives > numHDD)
 			return `Error: ${name} requires at least ${minDrives} drives`;
 
 		return generateMessage(name, (numHDD - parityDrives) * hddSize, parityDrives * hddSize, parityDrives, null);
-
 	}
 
 	new Vue({
 		el: "#app",
 		data: {
-			raidLevels: ["RAID0", "RAID1", "RAID4", "RAID5", "RAID6", "RAID-Z", "RAID-Z2", "RAID-Z3"],
+			raidLevels: ["RAID0", "RAID1", "RAID4", "RAID5", "RAID6", "RAID-Z0", "RAID-Z", "RAID-Z2", "RAID-Z3"],
 			indentLevel: 1,
 			numHDD: 4,
 			hddSize: 4,
@@ -87,9 +81,9 @@
 
 				switch (this.selectedRaidLevel) {
 					case "RAID0":
-						return generateMessage(this.selectedRaidLevel, parseInt(this.numHDD, 10) * parseInt(this.hddSize, 10), 0, 0, "If any one drive fails the entire array will be lost.");
+						return generateMessage(this.selectedRaidLevel, this.numHDD * this.hddSize, 0, 0, "If any one drive fails the entire array will be lost.");
 					case "RAID1":
-						return generateMessage(this.selectedRaidLevel, this.hddSize, 0, 0, `Can sustain ${parseInt(this.numHDD, 10) - 1} drive failures before data loss.`);
+						return generateMessage(this.selectedRaidLevel, this.hddSize, 0, 0, `Can sustain ${this.numHDD - 1} drive failures before data loss.`);
 					case "RAID4":
 						return calcRAIDMessage(this.selectedRaidLevel, 3, 1, this.numHDD, this.hddSize);
 					case "RAID5":
@@ -97,7 +91,7 @@
 					case "RAID6":
 						return calcRAIDMessage(this.selectedRaidLevel, 4, 2, this.numHDD, this.hddSize);
 					case "RAID-Z0":
-						return generateMessage(this.selectedRaidLevel, parseInt(this.numHDD, 10) * parseInt(this.hddSize, 10), 0, 0, "If any one drive fails the entire array will be lost.");
+						return generateMessage(this.selectedRaidLevel, this.numHDD * this.hddSize, 0, 0, "If any one drive fails the entire array will be lost.");
 					case "RAID-Z":
 						return calcRAIDMessage(this.selectedRaidLevel, 2, 1, this.numHDD, this.hddSize);
 					case "RAID-Z2":

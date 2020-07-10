@@ -11,17 +11,17 @@
 			<div class="form-row">
 				<div class="form-group col-md-4">
 					<label for="minNumField">Min value</label>
-					<input id="minNumField" class="form-control" type="number" v-model="minInt" min="0" max="4294967295">
+					<input id="minNumField" class="form-control" type="number" v-model.number="minInt" min="0" max="4294967295">
 				</div>
 
 				<div class="form-group col-md-4">
 					<label for="maxNumField">Max value</label>
-					<input id="maxNumField" class="form-control" type="number" v-model="maxInt" min="0" max="4294967295">
+					<input id="maxNumField" class="form-control" type="number" v-model.number="maxInt" min="0" max="4294967295">
 				</div>
 
 				<div class="form-group col-md-4">
 					<label for="countField">Count</label>
-					<input id="countField" class="form-control" type="number" v-model="count" min="1" max="65536">
+					<input id="countField" class="form-control" type="number" v-model.number="count" min="1" max="65536">
 				</div>
 			</div>
 
@@ -29,7 +29,7 @@
 		</form>
 
 		<div class="card mt-4" v-show="showResult">
-			<div class="card-header">Your Result:</div>
+			<div class="card-header">Result</div>
 			<div class="card-body">{{result}}</div>
 		</div>
 
@@ -52,12 +52,9 @@
 		},
 		methods: {
 			generate() {
-				const min = parseInt(this.minInt, 10);
-				const max = parseInt(this.maxInt, 10);
-
 				const out = [];
-				for (const v of window.crypto.getRandomValues(new Uint32Array(parseInt(this.count, 10))))
-					out.push(Math.floor(v / 2 ** 32 * (max - min + 1)) + min);
+				for (const v of window.crypto.getRandomValues(new Uint32Array(this.count)))
+					out.push(Math.floor(v / 2 ** 32 * (this.maxInt - this.minInt + 1)) + this.minInt);
 
 				this.result = out.join(", ");
 

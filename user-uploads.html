@@ -10,7 +10,7 @@
         <form>
             <div class="form-group">
                 <label for="textInputField">User to fetch uploads for (equivalent to <a href="https://en.wikipedia.org/wiki/Special:ListFiles" target="_blank">Special:ListFiles</a>)</label>
-                <input class="form-control" type="text" id="textInputField" v-model="text">
+                <input class="form-control" type="text" id="textInputField" v-model.trim="text">
                 <small class="text-muted form-text ">Note: usernames are case-sensitive</small>
             </div>
 
@@ -80,8 +80,6 @@
         },
         methods: {
             generate() {
-                this.text = this.text.trim();
-
                 if (!this.text)
                     return;
                 else if (this.text.toLowerCase().startsWith("user:"))

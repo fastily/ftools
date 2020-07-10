@@ -43,7 +43,7 @@
 				return this.text.length;
 			},
 			wordCount: function () {
-				return this.text ? this.text.trim().split(/\s+/).length : 0;
+				return this.text.trim() ? this.text.trim().split(/\s+/).length : 0;
 			},
 			lineCount: function () {
 				return this.text ? this.text.split("\n").length : 0;

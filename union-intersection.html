@@ -11,11 +11,11 @@
 			<div class="form-row">
 				<div class="form-group col-md-6">
 					<label for="textInputField1">Text Group 1</label>
-					<textarea class="form-control" rows="15" id="textInputField1" v-model="text1"></textarea>
+					<textarea class="form-control" rows="15" id="textInputField1" v-model.trim="text1"></textarea>
 				</div>
 				<div class="form-group col-md-6">
-					<label for="textInputField2">Text Group B</label>
-					<textarea class="form-control" rows="15" id="textInputField2" v-model="text2"></textarea>
+					<label for="textInputField2">Text Group 2</label>
+					<textarea class="form-control" rows="15" id="textInputField2" v-model.trim="text2"></textarea>
 				</div>
 			</div>
 
@@ -47,11 +47,6 @@
 {% block scripts %}
 {% raw %}
 <script>
-
-	function trimAndSplit(s) {
-		return s.trim().split("\n");
-	}
-
 	new Vue({
 		el: "#app",
 		data: {
@@ -64,12 +59,15 @@
 		methods: {
 			procText() {
 				let out = null;
+				const l1 = this.text1.split("\n");
+				const l2 = this.text2.split("\n");
+
 				if (this.mergeOption === "union")
-					out = Array.from(new Set(trimAndSplit(this.text1).concat(trimAndSplit(this.text2))));
+					out = Array.from(new Set(l1.concat(l2)));
 				else // intersection
 				{
-					const setA = new Set(trimAndSplit(this.text1));
-					out = Array.from(new Set(trimAndSplit(this.text2))).filter(x => setA.has(x));
+					const setA = new Set(l1);
+					out = Array.from(new Set(l2)).filter(x => setA.has(x));
 				}
 
 				this.showResult = true;

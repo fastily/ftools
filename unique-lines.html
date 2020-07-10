@@ -10,7 +10,7 @@
 		<form>
 			<div class="form-group">
 				<label for="textInputField">Lines to process</label>
-                <textarea class="form-control" rows="15" id="textInputField" v-model="text"></textarea>
+                <textarea class="form-control" rows="15" id="textInputField" v-model.trim="text"></textarea>
                 <small class="text-muted form-text">One entry per line</small>
             </div>
 
@@ -39,7 +39,7 @@
 		methods: {
 			deDupe() {
                 this.showResult = true;
-                this.result = Array.from(new Set(this.text.trim().split("\n"))).join("\n");
+                this.result = Array.from(new Set(this.text.split("\n"))).join("\n");
 			}
 		}
 	});
