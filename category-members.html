@@ -1,0 +1,128 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "category-members" %}
+{% set desc = "list all the pages in a category" %}
+
+{% block styles%}
+<link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" crossorigin="anonymous" />
+{% endblock %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <label for="textInputField">Get category members of</label>
+                <input class="form-control" type="text" id="textInputField" v-model.trim="text">
+                <small class="text-muted form-text">Note: category titles are case-sensitive</small>
+            </div>
+
+            <div class="form-group">
+                <label for="nsFilterDropdown">Restrict results to these namespaces (optional)</label>
+                <select class="form-control selectpicker" id="nsFilterDropdown" v-model="selectedNS" multiple>
+                    <option v-for="e in nsFilter" :value="e.value" :key="e.name">{{e.name}}</option>
+                </select>
+            </div>
+
+            <input type="button" value="Fetch" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
+            <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-show="isRunning"></span>
+        </form>
+
+        <div class="card mt-4" v-show="showResult">
+            <div class="card-header">Result</div>
+            <div class="card-body">
+                <pre>{{result}}</pre>
+            </div>
+        </div>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
+
+<script>
+    async function makeQuery(cat, selectedNS) {
+        const out = [];
+
+        let pl = {
+            action: "query",
+            format: "json",
+            formatversion: "2",
+            origin: "*",
+            list: "categorymembers",
+            cmlimit: "max",
+            cmtitle: cat,
+        }
+
+        if(selectedNS.length)
+            pl["cmnamespace"] = selectedNS.join("|");
+
+        let cont = null
+
+        do {
+            if (cont)
+                pl = {
+                    ...pl,
+                    ...cont
+                };
+
+            const response = await axios.get("https://en.wikipedia.org/w/api.php", { params: pl })
+            for (e of response.data.query.categorymembers)
+                out.push(e.title);
+
+            cont = "continue" in response.data ? response.data.continue : null;
+
+        } while (cont)
+
+        return out;
+    }
+
+    new Vue({
+        el: "#app",
+        data: {
+            text: "",
+            showResult: false,
+            result: "",
+            isRunning: false,
+            nsFilter: [],
+            selectedNS: []
+        },
+        created: function () {
+            axios.get("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&meta=siteinfo&formatversion=2&siprop=namespaces").then(response => {
+                this.nsFilter.push({ name: "(article)", value: "0" });
+
+                for (const [k, v] of Object.entries(response.data.query.namespaces))
+                    if (v.id > 0)
+                        this.nsFilter.push({ name: v.name, value: k });
+
+                Vue.nextTick(() => $('#nsFilterDropdown').selectpicker('refresh'));
+            })
+        },
+        methods: {
+            generate() {
+                this.text = this.text.trim();
+
+                if (!this.text)
+                    return;
+                else if (!this.text.toLowerCase().startsWith("category:"))
+                    this.text = "Category:" + this.text;
+
+                this.isRunning = true;
+                this.result = "";
+
+                makeQuery(this.text, this.selectedNS).then(l => {
+                    this.result = l.join("\n")
+                    this.isRunning = false;
+                    this.showResult = true;
+                });
+            }
+        }
+    });
+</script>
+{% endraw %}
+{% endblock %}

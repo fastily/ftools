@@ -23,7 +23,7 @@
 
 				<div class="form-group col-md-6">
 					<label for="hddSizeField">Hard Drive Size (TB)</label>
-					<input id="hddSizeField" class="form-control" type="number" v-model.number="hddSize" min="1">
+					<input id="hddSizeField" class="form-control" type="number" v-model.number="hddSize" step="any" min="0">
 				</div>
 			</div>
 		</form>
@@ -56,10 +56,7 @@
 	}
 
 	function calcRAIDMessage(name, minDrives, parityDrives, numHDD, hddSize) {
-		if (minDrives > numHDD)
-			return `Error: ${name} requires at least ${minDrives} drives`;
-
-		return generateMessage(name, (numHDD - parityDrives) * hddSize, parityDrives * hddSize, parityDrives, null);
+		return minDrives > numHDD ? `Error: ${name} requires at least ${minDrives} drives` : generateMessage(name, (numHDD - parityDrives) * hddSize, parityDrives * hddSize, parityDrives, null);
 	}
 
 	new Vue({
@@ -79,11 +76,14 @@
 
 				this.showResult = true;
 
+				if(this.hddSize == 0)
+					return "Error: Hard Drive Size cannot be 0";
+
 				switch (this.selectedRaidLevel) {
 					case "RAID0":
 						return generateMessage(this.selectedRaidLevel, this.numHDD * this.hddSize, 0, 0, "If any one drive fails the entire array will be lost.");
 					case "RAID1":
-						return generateMessage(this.selectedRaidLevel, this.hddSize, 0, 0, `Can sustain ${this.numHDD - 1} drive failures before data loss.`);
+						return generateMessage(this.selectedRaidLevel, this.hddSize, 0, 0, `Can tolerate ${this.numHDD - 1} drive failures before data loss.`);
 					case "RAID4":
 						return calcRAIDMessage(this.selectedRaidLevel, 3, 1, this.numHDD, this.hddSize);
 					case "RAID5":
