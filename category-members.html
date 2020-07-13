@@ -21,7 +21,7 @@
             <div class="form-group">
                 <label for="nsFilterDropdown">Restrict results to these namespaces (optional)</label>
                 <select class="form-control selectpicker" id="nsFilterDropdown" v-model="selectedNS" multiple>
-                    <option v-for="e in nsFilter" :value="e.value" :key="e.name">{{e.name}}</option>
+                    <option v-for="e in nsFilter" :value="e.id" :key="e.name">{{e.name}}</option>
                 </select>
             </div>
 
@@ -44,44 +44,9 @@
 {% raw %}
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
+<script src="jswiki.js" crossorigin="anonymous"></script>
 
 <script>
-    async function makeQuery(cat, selectedNS) {
-        const out = [];
-
-        let pl = {
-            action: "query",
-            format: "json",
-            formatversion: "2",
-            origin: "*",
-            list: "categorymembers",
-            cmlimit: "max",
-            cmtitle: cat,
-        }
-
-        if(selectedNS.length)
-            pl["cmnamespace"] = selectedNS.join("|");
-
-        let cont = null
-
-        do {
-            if (cont)
-                pl = {
-                    ...pl,
-                    ...cont
-                };
-
-            const response = await axios.get("https://en.wikipedia.org/w/api.php", { params: pl })
-            for (e of response.data.query.categorymembers)
-                out.push(e.title);
-
-            cont = "continue" in response.data ? response.data.continue : null;
-
-        } while (cont)
-
-        return out;
-    }
-
     new Vue({
         el: "#app",
         data: {
@@ -93,20 +58,13 @@
             selectedNS: []
         },
         created: function () {
-            axios.get("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&meta=siteinfo&formatversion=2&siprop=namespaces").then(response => {
-                this.nsFilter.push({ name: "(article)", value: "0" });
-
-                for (const [k, v] of Object.entries(response.data.query.namespaces))
-                    if (v.id > 0)
-                        this.nsFilter.push({ name: v.name, value: k });
-
+            JSWiki.listNamespaces().then(result => {
+                this.nsFilter = result;
                 Vue.nextTick(() => $('#nsFilterDropdown').selectpicker('refresh'));
-            })
+            });
         },
         methods: {
             generate() {
-                this.text = this.text.trim();
-
                 if (!this.text)
                     return;
                 else if (!this.text.toLowerCase().startsWith("category:"))
@@ -115,8 +73,8 @@
                 this.isRunning = true;
                 this.result = "";
 
-                makeQuery(this.text, this.selectedNS).then(l => {
-                    this.result = l.join("\n")
+                JSWiki.categoryMembers(this.text, this.selectedNS).then(l => {
+                    this.result = l.join("\n");
                     this.isRunning = false;
                     this.showResult = true;
                 });

@@ -34,42 +34,9 @@
 {% block scripts %}
 {% raw %}
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
+<script src="jswiki.js" crossorigin="anonymous"></script>
 
 <script>
-    async function makeQuery(user) {
-        const out = [];
-
-        let pl = {
-            action: "query",
-            format: "json",
-            formatversion: "2",
-            origin: "*",
-            list: "allimages",
-            aisort: "timestamp",
-            ailimit: "max",
-            aiuser: user,
-        }
-        let cont = null
-
-        do {
-            if (cont)
-                pl = {
-                    ...pl,
-                    ...cont
-                };
-
-            const response = await axios.get("https://en.wikipedia.org/w/api.php", { params: pl })
-            for (f of response.data.query.allimages)
-                out.push(f.title);
-
-            cont = "continue" in response.data ? response.data.continue : null;
-
-        } while (cont)
-
-        return out;
-    }
-
-
     new Vue({
         el: "#app",
         data: {
@@ -88,8 +55,8 @@
                 this.isRunning = true;
                 this.result = "";
 
-                makeQuery(this.text).then(l => {
-                    this.result = l.join("\n")
+                JSWiki.userUploads(this.text).then(l => {
+                    this.result = l.join("\n");
                     this.isRunning = false;
                     this.showResult = true;
                 });
