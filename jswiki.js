@@ -35,7 +35,12 @@ class JSWiki {
      * @param {string} queryName The name of the query (e.g. "categorymembers", "allimages").  This is also the key that results are returned under.
      * @param {function} fetchElement The method used to extract elements from individual JSON objects in the results array.
      */
-    static async listCont(pl, queryName, fetchElement) {
+    static async listCont(pl, queryName, fetchElement = e => e.title) {
+        pl = {
+            ...wpApiQueryDefaults,
+            ...pl
+        }
+
         const out = [];
         let cont = null
         do {
@@ -63,7 +68,6 @@ class JSWiki {
      */
     static async categoryMembers(cat, selectedNS = []) {
         let pl = {
-            ...wpApiQueryDefaults,
             list: "categorymembers",
             cmlimit: "max",
             cmtitle: cat,
@@ -72,7 +76,7 @@ class JSWiki {
         if (selectedNS.length)
             pl["cmnamespace"] = selectedNS.join("|");
 
-        return await this.listCont(pl, "categorymembers", e => e.title);
+        return await this.listCont(pl, "categorymembers");
     }
 
     /**
@@ -81,11 +85,10 @@ class JSWiki {
      */
     static async userUploads(user) {
         return await this.listCont({
-            ...wpApiQueryDefaults,
             list: "allimages",
             aisort: "timestamp",
             ailimit: "max",
             aiuser: user,
-        }, "allimages", e => e.title);
+        }, "allimages");
     }
 }
