@@ -1,7 +1,7 @@
 {% extends 'templates/tool-base.html' %}
 
-{% set title = "template-transclusions" %}
-{% set desc = "get the list of pages transcluding a page/template" %}
+{% set title = "category-members" %}
+{% set desc = "list all the pages in a category" %}
 
 {% block styles%}
 <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" crossorigin="anonymous" />
@@ -13,9 +13,9 @@
     <div id="app">
         <form>
             <div class="form-group">
-                <label for="textInputField">Get transclusions of</label>
-                <input class="form-control" type="text" id="textInputField" v-model.trim="text" v-bind:disabled="isRunning">
-                <small class="text-muted form-text">Title is case-sensitive, include namespace prefix if applicable</small>
+                <label for="textInputField">Get category members of</label>
+                <input class="form-control" type="text" id="textInputField" v-model.trim="text">
+                <small class="text-muted form-text">Note: category titles are case-sensitive</small>
             </div>
 
             <div class="form-group">
@@ -44,7 +44,7 @@
 {% raw %}
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
-<script src="jswiki.js" crossorigin="anonymous"></script>
+<script src="/jswiki.js" crossorigin="anonymous"></script>
 
 <script>
     new Vue({
@@ -67,12 +67,14 @@
             generate() {
                 if (!this.text)
                     return;
+                else if (!this.text.toLowerCase().startsWith("category:"))
+                    this.text = "Category:" + this.text;
 
                 this.isRunning = true;
                 this.result = "";
 
-                JSWiki.transclusions(this.text, this.selectedNS).then(m => {
-                    this.result = m.get(this.text).join("\n");
+                JSWiki.categoryMembers(this.text, this.selectedNS).then(l => {
+                    this.result = l.join("\n");
                     this.isRunning = false;
                     this.showResult = true;
                 });

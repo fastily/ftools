@@ -1,11 +1,7 @@
 {% extends 'templates/tool-base.html' %}
 
-{% set title = "category-members" %}
-{% set desc = "list all the pages in a category" %}
-
-{% block styles%}
-<link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" crossorigin="anonymous" />
-{% endblock %}
+{% set title = "user-uploads" %}
+{% set desc = "list all of user's uploads" %}
 
 {% block tool %}
 {% raw %}
@@ -13,17 +9,11 @@
     <div id="app">
         <form>
             <div class="form-group">
-                <label for="textInputField">Get category members of</label>
+                <label for="textInputField">User to fetch uploads for (equivalent to <a href="https://en.wikipedia.org/wiki/Special:ListFiles" target="_blank">Special:ListFiles</a>)</label>
                 <input class="form-control" type="text" id="textInputField" v-model.trim="text">
-                <small class="text-muted form-text">Note: category titles are case-sensitive</small>
+                <small class="text-muted form-text ">Note: usernames are case-sensitive</small>
             </div>
 
-            <div class="form-group">
-                <label for="nsFilterDropdown">Restrict results to these namespaces (optional)</label>
-                <select class="form-control selectpicker" id="nsFilterDropdown" v-model="selectedNS" multiple>
-                    <option v-for="e in nsFilter" :value="e.id" :key="e.name">{{e.name}}</option>
-                </select>
-            </div>
 
             <input type="button" value="Fetch" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
             <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-show="isRunning"></span>
@@ -35,6 +25,7 @@
                 <pre>{{result}}</pre>
             </div>
         </div>
+
     </div>
 </section>
 {% endraw %}
@@ -43,8 +34,7 @@
 {% block scripts %}
 {% raw %}
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
-<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
-<script src="jswiki.js" crossorigin="anonymous"></script>
+<script src="/jswiki.js" crossorigin="anonymous"></script>
 
 <script>
     new Vue({
@@ -54,26 +44,18 @@
             showResult: false,
             result: "",
             isRunning: false,
-            nsFilter: [],
-            selectedNS: []
-        },
-        created: function () {
-            JSWiki.listNamespaces().then(result => {
-                this.nsFilter = result;
-                Vue.nextTick(() => $('#nsFilterDropdown').selectpicker('refresh'));
-            });
         },
         methods: {
             generate() {
                 if (!this.text)
                     return;
-                else if (!this.text.toLowerCase().startsWith("category:"))
-                    this.text = "Category:" + this.text;
+                else if (this.text.toLowerCase().startsWith("user:"))
+                    this.text = this.text.substring(5);
 
                 this.isRunning = true;
                 this.result = "";
 
-                JSWiki.categoryMembers(this.text, this.selectedNS).then(l => {
+                JSWiki.userUploads(this.text).then(l => {
                     this.result = l.join("\n");
                     this.isRunning = false;
                     this.showResult = true;
