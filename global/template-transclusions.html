@@ -44,9 +44,9 @@
 {% raw %}
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
-<script src="/jswiki.js" crossorigin="anonymous"></script>
+<script type="module">
+    import JSWiki from "/jswiki.js";
 
-<script>
     new Vue({
         el: "#app",
         data: {
@@ -72,7 +72,9 @@
                 this.result = "";
 
                 JSWiki.transclusions(this.text, this.selectedNS).then(m => {
-                    this.result = m.get(this.text).join("\n");
+                    if (m && m.has(this.text))
+                        this.result = m.get(this.text).join("\n");
+
                     this.isRunning = false;
                     this.showResult = true;
                 });

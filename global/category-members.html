@@ -44,9 +44,9 @@
 {% raw %}
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
-<script src="/jswiki.js" crossorigin="anonymous"></script>
+<script type="module">
+    import JSWiki from "/jswiki.js";
 
-<script>
     new Vue({
         el: "#app",
         data: {

@@ -141,3 +141,5 @@ class JSWiki {
         return await this.propCont(pl, "transcludedin", title);
     }
 }
+
+export default JSWiki;
