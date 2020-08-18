@@ -20,7 +20,7 @@ class JSWiki {
             }
         });
 
-        const out = [{ name: "(article)", id: 0 }];
+        const out = [{ name: "(article)", id: "0" }];
 
         for (const [k, v] of Object.entries(response.data.query.namespaces))
             if (v.id > 0)

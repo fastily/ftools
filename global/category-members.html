@@ -18,12 +18,7 @@
                 <small class="text-muted form-text">Note: category titles are case-sensitive</small>
             </div>
 
-            <div class="form-group">
-                <label for="nsFilterDropdown">Restrict results to these namespaces (optional)</label>
-                <select class="form-control selectpicker" id="nsFilterDropdown" v-model="selectedNS" multiple>
-                    <option v-for="e in nsFilter" :value="e.id" :key="e.name">{{e.name}}</option>
-                </select>
-            </div>
+            <ns-picker v-model="selectedNS"></ns-picker>
 
             <input type="button" value="Fetch" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
             <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-show="isRunning"></span>
@@ -46,6 +41,7 @@
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
 <script type="module">
     import JSWiki from "/jswiki.js";
+    import { nsPicker } from "/comps.js";
 
     new Vue({
         el: "#app",
@@ -54,14 +50,10 @@
             showResult: false,
             result: "",
             isRunning: false,
-            nsFilter: [],
             selectedNS: []
         },
-        created: function () {
-            JSWiki.listNamespaces().then(result => {
-                this.nsFilter = result;
-                Vue.nextTick(() => $('#nsFilterDropdown').selectpicker('refresh'));
-            });
+        components: {
+            "ns-picker": nsPicker
         },
         methods: {
             generate() {
