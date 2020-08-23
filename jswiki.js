@@ -1,5 +1,3 @@
-const wpApiEndpoint = "https://en.wikipedia.org/w/api.php";
-
 const wpApiQueryDefaults = {
     action: "query",
     format: "json",
@@ -9,10 +7,27 @@ const wpApiQueryDefaults = {
 
 class JSWiki {
     /**
+     * Constructor, creates a new Wiki object with the specified hostname.
+     * @param {string} hostname The hostname of the Wiki to use
+     */
+    constructor(hostname = "en.wikipedia.org") {
+        this.setHostname(hostname);
+    }
+
+    /**
+     * Sets the hostname of the server to query.
+     * @param {string} hostname Configures the JSWiki object to use this hostname in the URL 
+     */
+    setHostname(hostname) {
+        this.hostname = hostname;
+        this.apiEndpoint = `https://${this.hostname}/w/api.php`
+    }
+
+    /**
      * Lists all namespaces on enwp
      */
-    static async listNamespaces() {
-        const response = await axios.get(wpApiEndpoint, {
+    async listNamespaces() {
+        const response = await axios.get(this.apiEndpoint, {
             params: {
                 ...wpApiQueryDefaults,
                 meta: "siteinfo",
@@ -29,6 +44,28 @@ class JSWiki {
         return out;
     }
 
+
+    /**
+     * Gets the site matrix for wiki farm the Wiki represented by this JSWiki is part of.
+     */
+    async siteMatrix() {
+        const response = await axios.get(this.apiEndpoint, {
+            params: {
+                ...wpApiQueryDefaults,
+                action: "sitematrix",
+            }
+        });
+
+        const out = new Set(["commons.wikimedia.org", "meta.wikimedia.org", "species.wikimedia.org", "test.wikipedia.org", "www.wikidata.org"]);
+        for (const [k, v] of Object.entries(response.data.sitematrix))
+            if (parseInt(k) && v.site)
+                for (const e of v.site)
+                    if (!e.closed)
+                        out.add(new URL(e.url).hostname);
+
+        return out;
+    }
+
     /**
      * Performs a prop API query, loops until all elements have been retrieved.  Results are returned in a map keyed by title.
      * @param {Object} pl The parameter list to query Wikipedia with
@@ -36,7 +73,7 @@ class JSWiki {
      * @param {any} titles The title(s) to query.  This can be an Array of string (multiple titles) or just a String (one title)
      * @param {function} fetchElement The method used to extract elements from individual JSON objects in the results array.
      */
-    static async propCont(pl, queryName, titles, fetchElement = e => e.title) {
+    async propCont(pl, queryName, titles, fetchElement = e => e.title) {
         pl = {
             prop: queryName,
             titles: titles instanceof Array ? titles.join("|") : titles,
@@ -53,7 +90,7 @@ class JSWiki {
                     ...cont
                 };
 
-            const response = await axios.get(wpApiEndpoint, { params: pl })
+            const response = await axios.get(this.apiEndpoint, { params: pl })
             for (const e of response.data.query.pages)
                 if (queryName in e) {
                     const l = e[queryName].map(fetchElement)
@@ -72,7 +109,7 @@ class JSWiki {
      * @param {string} queryName The name of the query (e.g. "categorymembers", "allimages").  This is also the key that results are returned under.
      * @param {function} fetchElement The method used to extract elements from individual JSON objects in the results array.
      */
-    static async listCont(pl, queryName, fetchElement = e => e.title) {
+    async listCont(pl, queryName, fetchElement = e => e.title) {
         pl = {
             list: queryName,
             ...wpApiQueryDefaults,
@@ -88,7 +125,7 @@ class JSWiki {
                     ...cont
                 };
 
-            const response = await axios.get(wpApiEndpoint, { params: pl })
+            const response = await axios.get(this.apiEndpoint, { params: pl })
             for (const e of response.data.query[queryName])
                 out.push(fetchElement(e));
 
@@ -103,7 +140,7 @@ class JSWiki {
      * @param {string} cat The category to list members of
      * @param {Array} selectedNS Optional - if set, then only pages in these namespaces will be returned (array of strings).
      */
-    static async categoryMembers(cat, selectedNS = []) {
+    async categoryMembers(cat, selectedNS = []) {
         const pl = {
             cmlimit: "max",
             cmtitle: cat,
@@ -118,7 +155,7 @@ class JSWiki {
      * List all the uploads of a user
      * @param {string} user The username (wihtout User: prefix) to list uploads for
      */
-    static async userUploads(user) {
+    async userUploads(user) {
         return await this.listCont({
             aisort: "timestamp",
             ailimit: "max",
@@ -131,7 +168,7 @@ class JSWiki {
      * @param {string} title The title to fetch transclusions of
      * @param {Array} selectedNS Optional - if set, then only pages in these namespaces will be returned (array of strings).
      */
-    static async transclusions(title, selectedNS = []) {
+    async transclusions(title, selectedNS = []) {
         const pl = {
             tilimit: "max",
         };

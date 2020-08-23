@@ -1,6 +1,7 @@
 import JSWiki from "/jswiki.js";
+import { defaultTargetWiki } from "/utils.js";
 
-const nsPicker = {
+export const nsPicker = {
     props: ["value"],
     data() {
         return {
@@ -9,7 +10,7 @@ const nsPicker = {
         }
     },
     created() {
-        JSWiki.listNamespaces().then(result => {
+        new JSWiki(defaultTargetWiki()).listNamespaces().then(result => {
             this.nsFilter = result;
             Vue.nextTick(() => $('#nsFilterDropdown').selectpicker('refresh'));
         });
@@ -23,4 +24,16 @@ const nsPicker = {
     </div>`
 };
 
-export { nsPicker }
+export const targetWiki = {
+    data() {
+        return {
+            content: defaultTargetWiki()
+        }
+    },
+    template: `
+    <div class="form-group">
+        <label for="targetWikiField">Target Wiki</label>
+        <input id="targetWikiField" class="form-control" v-model="content" disabled>
+        <small class="text-muted form-text">configure your default wiki <a href="/settings.html">here</a></small>
+    </div>`
+};

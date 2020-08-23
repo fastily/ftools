@@ -20,10 +20,9 @@
     <link rel="icon" href="https://tools-static.wmflabs.org/toolforge/favicons/favicon.ico" type="image/x-icon">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
 
-    {% block styles %}
-    {% endblock %}
+    {% block styles %}{% endblock %}
 </head>
 
 <body>
@@ -35,8 +34,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    {% block navbar_links %}
-                    {% endblock %}
+                    {% block navbar_links %}{% endblock %}
+                    <li class="nav-item">
+                        <a target="_blank" class="nav-link" href="https://github.com/fastily/ftools">Source</a>
+                    </li>
                     <li class="nav-item">
                         <a target="_blank" class="nav-link" href="https://toolforge.org">Toolforge</a>
                     </li>
@@ -45,15 +46,13 @@
         </div>
     </nav>
 
-    {% block content %}
-    {% endblock %}
+    {% block content %}{% endblock %}
 
     <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/popper.js/1.16.0/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/popper.js/1.16.1/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/vue/2.6.11/vue.min.js" crossorigin="anonymous"></script>
-    {% block scripts %}
-    {% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 
 </html>

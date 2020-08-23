@@ -1,9 +1,11 @@
 {% extends 'templates/base.html' %}
 
 {% block navbar_links %}
+{% if category == "global" %}
 <li class="nav-item">
-    <a target="_blank" class="nav-link" href="https://github.com/fastily/ftools/blob/master/{{title}}.html">Source</a>
+    <a class="nav-link" href="/settings.html">Settings</a>
 </li>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -14,7 +16,6 @@
     </div>
 </header>
 
-{% block tool %}
-{% endblock %}
+{% block tool %}{% endblock %}
 
 {% endblock %}

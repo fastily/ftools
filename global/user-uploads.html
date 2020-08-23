@@ -1,5 +1,6 @@
 {% extends 'templates/tool-base.html' %}
 
+{% set category = "global" %}
 {% set title = "user-uploads" %}
 {% set desc = "list all of user's uploads" %}
 
@@ -14,6 +15,7 @@
                 <small class="text-muted form-text ">Note: usernames are case-sensitive</small>
             </div>
 
+            <target-wiki></target-wiki>
 
             <input type="button" value="Fetch" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
             <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-show="isRunning"></span>
@@ -36,6 +38,10 @@
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
 <script type="module">
     import JSWiki from "/jswiki.js";
+    import { targetWiki } from "/comps.js";
+    import { defaultTargetWiki } from "/utils.js";
+
+    const wiki = new JSWiki(defaultTargetWiki());
 
     new Vue({
         el: "#app",
@@ -44,6 +50,9 @@
             showResult: false,
             result: "",
             isRunning: false,
+        },
+        components: {
+            "target-wiki": targetWiki
         },
         methods: {
             generate() {
@@ -55,7 +64,7 @@
                 this.isRunning = true;
                 this.result = "";
 
-                JSWiki.userUploads(this.text).then(l => {
+                wiki.userUploads(this.text).then(l => {
                     this.result = l.join("\n");
                     this.isRunning = false;
                     this.showResult = true;
