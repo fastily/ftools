@@ -5,7 +5,7 @@
 {% set desc = "list all the pages in a category" %}
 
 {% block styles%}
-<link rel="stylesheet" href="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css" crossorigin="anonymous" />
+{% include 'templates/lib-bootstrap-select-css.html' %}
 {% endblock %}
 
 {% block tool %}
@@ -38,9 +38,10 @@
 {% endblock %}
 
 {% block scripts %}
+{% include 'templates/lib-axios.html' %}
+{% include 'templates/lib-bootstrap-select-js.html' %}
+
 {% raw %}
-<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
-<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js" crossorigin="anonymous"></script>
 <script type="module">
     import JSWiki from "/jswiki.js";
     import { nsPicker, targetWiki } from "/comps.js";

@@ -34,8 +34,9 @@
 {% endblock %}
 
 {% block scripts %}
+{% include 'templates/lib-axios.html' %}
+
 {% raw %}
-<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/axios/0.19.2/axios.min.js" crossorigin="anonymous"></script>
 <script type="module">
     import JSWiki from "/jswiki.js";
     import { targetWiki } from "/comps.js";
