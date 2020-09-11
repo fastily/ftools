@@ -39,13 +39,13 @@
 			text: ""
 		},
 		computed: {
-			charCount: function () {
+			charCount() {
 				return this.text.length;
 			},
-			wordCount: function () {
+			wordCount() {
 				return this.text.trim() ? this.text.trim().split(/\s+/).length : 0;
 			},
-			lineCount: function () {
+			lineCount() {
 				return this.text ? this.text.split("\n").length : 0;
 			}
 		}
