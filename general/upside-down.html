@@ -131,16 +131,15 @@
                 this.badChars.clear();
 
                 let out = "";
-                for (let s of this.text) {
-                    if (m[s])
-                        out += m[s];
+                for (const c of this.text)
+                    if (m[c])
+                        out += m[c];
                     else {
-                        if (!wl.has(s))
-                            this.badChars.add(s);
+                        if (!wl.has(c))
+                            this.badChars.add(c);
 
-                        out += s;
+                        out += c;
                     }
-                }
 
                 this.hasError = this.badChars.size > 0;
 

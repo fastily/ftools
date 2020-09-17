@@ -1,0 +1,33 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "user-agent" %}
+{% set desc = "displays your browser's current user agent" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+	<div id="app">
+		<div class="card mt-4">
+			<div class="card-header">Your web browser's <a href="https://en.wikipedia.org/wiki/User_agent">user agent</a> is</div>
+			<div class="card-body">
+				<pre>{{userAgent}}</pre>
+			</div>
+		</div>
+	</div>
+</section>
+{% endraw %}
+{% endblock %}
+
+
+{% block scripts %}
+{% raw %}
+<script>
+	new Vue({
+		el: "#app",
+		data: {
+			userAgent: navigator.userAgent
+		}
+	});
+</script>
+{% endraw %}
+{% endblock %}
