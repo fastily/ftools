@@ -1,16 +1,25 @@
 {% extends 'templates/tool-base.html' %}
 
 {% set title = "user-agent" %}
-{% set desc = "displays your browser's current user agent" %}
+{% set desc = "parse browser user agents" %}
 
 {% block tool %}
 {% raw %}
 <section class="container">
 	<div id="app">
-		<div class="card mt-4">
-			<div class="card-header">Your web browser's <a href="https://en.wikipedia.org/wiki/User_agent">user agent</a> is</div>
+		<form>
+			<div class="form-group">
+				<label for="mainTextInput">User agent to parse</label>
+				<textarea class="form-control" rows="5" id="mainTextInput" v-model.trim="text"></textarea>
+				<small class="text-muted form-text">Click <a href="#" v-on:click.prevent="fillMyUA">here</a> to autofill your browser's user agent</small>
+			</div>
+			<input type="button" value="Submit" class="btn btn-primary" v-on:click.prevent="parseUA">
+		</form>
+
+		<div class="card mt-4" v-show="outputText">
+			<div class="card-header">Parsed user agent</div>
 			<div class="card-body">
-				<pre>{{userAgent}}</pre>
+				<pre>{{outputText}}</pre>
 			</div>
 		</div>
 	</div>
@@ -18,14 +27,26 @@
 {% endraw %}
 {% endblock %}
 
-
 {% block scripts %}
 {% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/UAParser.js/0.7.22/ua-parser.min.js" crossorigin="anonymous"></script>
+
 <script>
+	const parser = new UAParser();
+
 	new Vue({
 		el: "#app",
 		data: {
-			userAgent: navigator.userAgent
+			text: "",
+			outputText: ""
+		},
+		methods: {
+			fillMyUA() {
+				this.text = navigator.userAgent;
+			},
+			parseUA() {
+				this.outputText = parser.setUA(this.text).getResult();
+			}
 		}
 	});
 </script>
