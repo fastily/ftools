@@ -12,6 +12,7 @@
             "union-intersection": "Perform a union or intersection on two sets of lines/strings",
             "unique-lines": "Remove duplicated lines from a body of text",
             "upside-down": "Flips ascii text upside down",
+            "url-encode": "Encode/Decode URI/URLs",
             "user-agent": "Parse browser user agents",
             "word-count": "Counts the number of characters, words, and lines in a body of text"
         },
