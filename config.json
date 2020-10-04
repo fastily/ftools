@@ -21,6 +21,7 @@
         },
         "global": {
             "category-members": "List category pages with basic namespace filtering",
+            "diff-permalink": "Convert diff URLs to Wikilinks",
             "template-transclusions": "Get the list of pages transcluding a page/template",
             "user-uploads": "List a user's uploads in plain text",
             "wikilinks-from-list": "Generate wikitext links from a list of titles"
