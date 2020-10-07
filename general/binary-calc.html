@@ -1,0 +1,93 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "binary-calc" %}
+{% set desc = "convert integers to/from binary/octal/decimal/hex" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <label for="selectInputBase">What base is your input number?</label>
+                <select class="form-control" id="selectInputBase" v-model="inputBase">
+                    <option v-for="(value, baseName) in bases" :key="value" :value="baseName">{{baseName}} ({{value}})</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="inputNum">Number to convert:</label>
+                <textarea class="form-control" rows="3" id="inputNum" v-model="inputNum"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="selectOutputBase">What base should the output format be?</label>
+                <select class="form-control" id="selectOutputBase" v-model="outputBase">
+                    <option v-for="(value, baseName) in bases" :key="value" :value="baseName">{{baseName}} ({{value}})</option>
+                </select>
+            </div>
+        </form>
+
+        <div class="card mt-4" v-show="inputNum">
+            <div class="card-header">Result</div>
+            <div class="card-body">
+                <pre>{{calcBase()}}</pre>
+            </div>
+        </div>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+
+{% block scripts %}
+{% raw %}
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            bases: { binary: 2, octal: 8, decimal: 10, hex: 16 },
+            inputBase: "decimal",
+            outputBase: "binary",
+            inputNum: ""
+        },
+        methods: {
+            convert(s, radixIn, radixOut) {
+                return parseInt(s, radixIn).toString(this.bases[this.outputBase]);
+            },
+
+            calcBase() {
+                if (!this.inputNum)
+                    return "";
+
+                let s = this.inputNum.trim();
+                switch (this.bases[this.inputBase]) {
+                    case 2:
+                        if (/^[01]*$/.test(s))
+                            return this.convert(s, 2);
+                        break;
+                    case 8:
+                        if (/^[0-7]*$/.test(s))
+                            return this.convert(s, 8);
+                        break;
+                    case 10:
+                        if (/^[0-9]*$/.test(s))
+                            return this.convert(s, 10);
+                        break;
+                    case 16:
+                        if (/^[0-9a-fA-F]*$/.test(s))
+                            return this.convert(s, 16);
+                        break;
+                    default:
+                        console.log("Should never reach here, what happened?");
+                        break;
+                }
+
+                return `Invalid input, expected input must be in base ${this.inputBase}.`
+            }
+        }
+    });
+</script>
+
+{% endraw %}
+{% endblock %}

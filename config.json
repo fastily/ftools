@@ -1,7 +1,8 @@
 {
     "index": {
         "general": {
-            "base-encode": "Encode/Decode strings from/to base64, convert integers to/from binary, octal, decimal, and/or hex",
+            "base-encode": "Encode/Decode strings to/from base64",
+            "binary-calc": "Convert integers to/from binary/octal/decimal/hex",
             "find-and-replace": "Find and replace text in text",
             "ip-range-calc": "Calculates the smallest CIDR block encompassing a given list of IP addresses",
             "json-format": "Pretty-print JSON",

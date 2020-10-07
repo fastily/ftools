@@ -1,84 +1,34 @@
 {% extends 'templates/tool-base.html' %}
 
 {% set title = "base-encode" %}
-{% set desc = "the base conversion calculator" %}
+{% set desc = "encode/decode strings to/from base64" %}
 
 {% block tool %}
 {% raw %}
-<section>
-	<div class="container mt-4">
-		<ul class="nav nav-pills justify-content-center" id="pills-tab" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" data-toggle="pill" href="#b64App" role="tab">Base64 Calculator</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" data-toggle="pill" href="#bcalcApp" role="tab">Binary Calculator</a>
-			</li>
-		</ul>
-	</div>
-</section>
-
 <section class="container">
-	<div class="tab-content">
-		<div id="b64App" class="tab-pane fade show active" role="tabpanel">
-			<form>
-				<div class="form-group">
-					<label for="selectAlgBox">Enter the text you want to encode or decode:</label>
-					<select class="form-control" id="selectAlgBox" v-model="selectedAlg">
-						<option v-for="a in actions" :key="a" :value="a">{{a}}</option>
-					</select>
-				</div>
-
-				<div class="form-group">
-					<label for="mainTextInput">Text to process:</label>
-					<textarea class="form-control" rows="3" id="mainTextInput" v-model="inputText"></textarea>
-				</div>
-			</form>
-
-			<div class="card mt-4">
-				<div class="card-header">
-					And here is your result:
-				</div>
-				<div class="card-body">
-					{{procText()}}
-				</div>
+	<div id="app">
+		<form>
+			<div class="form-group">
+				<label for="selectAlgBox">Enter the text you want to encode or decode:</label>
+				<select class="form-control" id="selectAlgBox" v-model="selectedAlg">
+					<option v-for="a in actions" :key="a" :value="a">{{a}}</option>
+				</select>
 			</div>
-		</div>
 
-		<div id="bcalcApp" class="tab-pane fade" role="tabpanel">
-			<form>
-				<div class="form-group">
-					<label for="selectInputBase">What base is your input number?</label>
-					<select class="form-control" id="selectInputBase" v-model="inputBase">
-						<option v-for="(value, baseName) in bases" :key="value" :value="baseName">{{baseName}} ({{value}})</option>
-					</select>
-				</div>
+			<div class="form-group">
+				<label for="mainTextInput">Text to process:</label>
+				<textarea class="form-control" rows="3" id="mainTextInput" v-model="inputText"></textarea>
+			</div>
+		</form>
 
-				<div class="form-group">
-					<label for="inputNum">Number to convert:</label>
-					<textarea class="form-control" rows="3" id="inputNum" v-model="inputNum"></textarea>
-				</div>
-
-				<div class="form-group">
-					<label for="selectOutputBase">What base should the output format be?</label>
-					<select class="form-control" id="selectOutputBase" v-model="outputBase">
-						<option v-for="(value, baseName) in bases" :key="value" :value="baseName">{{baseName}} ({{value}})</option>
-					</select>
-				</div>
-			</form>
-
-			<div class="card mt-4">
-				<div class="card-header">
-					And here is your result:
-				</div>
-				<div class="card-body">
-					{{calcBase()}}
-				</div>
+		<div class="card mt-4" v-show="inputText">
+			<div class="card-header">Result</div>
+			<div class="card-body">
+				<pre>{{procText()}}</pre>
 			</div>
 		</div>
 	</div>
 </section>
-
 {% endraw %}
 {% endblock %}
 
@@ -87,7 +37,7 @@
 {% raw %}
 <script>
 	new Vue({
-		el: "#b64App",
+		el: "#app",
 		data: {
 			actions: ["encode", "decode"],
 			selectedAlg: "encode",
@@ -115,51 +65,6 @@
 					console.log(e);
 					return `Invalid input unable to ${this.selectedAlg}`;
 				}
-			}
-		}
-	});
-
-	new Vue({
-		el: "#bcalcApp",
-		data: {
-			bases: { binary: 2, octal: 8, decimal: 10, hex: 16 },
-			inputBase: "decimal",
-			outputBase: "binary",
-			inputNum: ""
-		},
-		methods: {
-			convert(s, radixIn, radixOut) {
-				return parseInt(s, radixIn).toString(this.bases[this.outputBase]);
-			},
-
-			calcBase() {
-				if (!this.inputNum)
-					return "";
-
-				let s = this.inputNum.trim();
-				switch (this.bases[this.inputBase]) {
-					case 2:
-						if (/^[01]*$/.test(s))
-							return this.convert(s, 2);
-						break;
-					case 8:
-						if (/^[0-7]*$/.test(s))
-							return this.convert(s, 8);
-						break;
-					case 10:
-						if (/^[0-9]*$/.test(s))
-							return this.convert(s, 10);
-						break;
-					case 16:
-						if (/^[0-9a-fA-F]*$/.test(s))
-							return this.convert(s, 16);
-						break;
-					default:
-						console.log("Should never reach here, what happened?");
-						break;
-				}
-
-				return `Invalid input, expected input must be in base ${this.inputBase}.`
 			}
 		}
 	});
