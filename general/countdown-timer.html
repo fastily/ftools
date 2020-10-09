@@ -1,0 +1,80 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "countdown-timer" %}
+{% set desc = "a simple countdown timer" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+
+        <div v-show="isRunning">
+            <div class="text-center">
+                <h1 class="display-1">{{displayTS}}</h1>
+            </div>
+            <button type="button" class="btn btn-warning" v-on:click="isRunning = false">Cancel</button>
+        </div>
+
+        <form v-show="!isRunning">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="hoursField">Hours</label>
+                    <input id="hoursField" class="form-control" type="number" v-model.number="inputHours" min="0" max="23">
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="minsField">Minutes</label>
+                    <input id="minsField" class="form-control" type="number" v-model.number="inputMins" min="0" max="59">
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="secsField">Seconds</label>
+                    <input id="secsField" class="form-control" type="number" v-model.number="inputSecs" min="0" max="59">
+                </div>
+            </div>
+
+            <input type="button" value="Start" class="btn btn-primary" v-on:click.prevent="start" v-bind:disabled="!(inputHours || inputMins || inputSecs)">
+        </form>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            inputHours: 0,
+            inputMins: 0,
+            inputSecs: 0,
+            isRunning: false,
+            targetDate: null,
+            displayTS: ""
+        },
+        methods: {
+            updateTimer() {
+                const rSecs = (this.targetDate - Date.now()) / 1000;
+
+                if (this.isRunning && rSecs > 0) {
+                    this.displayTS = `${this.zPad(rSecs / 3600)}:${this.zPad(rSecs % 3600 / 60)}:${this.zPad(rSecs % 60)}`
+                    requestAnimationFrame(this.updateTimer)
+                }
+                else
+                    this.displayTS = "Timer Complete!"
+            },
+            start() {
+                this.targetDate = Date.now() + (this.inputHours * 60 * 60 + this.inputMins * 60 + this.inputSecs) * 1000;
+                this.isRunning = true;
+
+                requestAnimationFrame(this.updateTimer);
+            },
+            zPad(n) {
+                return Math.floor(n).toString().padStart(2, 0);
+            }
+        }
+    });
+</script>
+{% endraw %}
+{% endblock %}

@@ -3,6 +3,7 @@
         "general": {
             "base-encode": "Encode/Decode strings to/from base64",
             "binary-calc": "Convert integers to/from binary/octal/decimal/hex",
+            "countdown-timer": "a simple countdown timer",
             "find-and-replace": "Find and replace text in text",
             "ip-range-calc": "Calculates the smallest CIDR block encompassing a given list of IP addresses",
             "json-format": "Pretty-print JSON",
