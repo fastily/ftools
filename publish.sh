@@ -10,4 +10,9 @@
 
 cd "${0%/*}" &> /dev/null
 
+if ! command -v jinja2html; then
+    printf "jinja2html is not available.  Please either install it or remember to start your virtualenv :)\n"
+    exit
+fi
+
 jinja2html --generate && scp -r out/* toolforge:/data/project/ftools/public_html

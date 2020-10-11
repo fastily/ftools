@@ -1,0 +1,122 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "uuid" %}
+{% set desc = "generate and validate uuids" %}
+
+{% block tool %}
+{% raw %}
+<section class="container mt-4">
+    <ul class="nav nav-pills justify-content-center" id="pills-tab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="pill" href="#generateApp" role="tab">Generate</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="pill" href="#validateApp" role="tab">Validate</a>
+        </li>
+    </ul>
+</section>
+
+<section class="container">
+    <div class="tab-content">
+        <div id="generateApp" class="tab-pane fade show active" role="tabpanel">
+            <form>
+                <div class="form-group">
+                    <label for="selectedUuidType">What kind of UUID should be generated?</label>
+                    <select class="form-control" id="selectedUuidType" v-model="uuidVersion">
+                        <option v-for="uuidType in ['1', '3', '4', '5']" :key="uuidType" :value="uuidType">uuid{{uuidType}}</option>
+                    </select>
+                </div>
+
+                <div class="form-row" v-show="uuidVersion === '3' || uuidVersion === '5'">
+                    <div class="form-group col-md-6">
+                        <label for="nameField">Name</label>
+                        <input id="nameField" class="form-control" type="text" v-model="name">
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="uuidNamespaceField">Namespace UUID</label>
+                        <input id="uuidNamespaceField" class="form-control" type="text" v-model="namespace">
+                    </div>
+                </div>
+
+                <input type="button" value="Generate" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="(uuidVersion === '3' || uuidVersion === '5') && (!name || !namespace)">
+            </form>
+
+            <div class="card mt-4" v-show="result">
+                <div class="card-header">Result</div>
+                <div class="card-body">
+                    <pre>{{result}}</pre>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="validateApp" class="tab-pane fade" role="tabpanel">
+            <form>
+                <div class="form-group">
+                    <label for="uuidInputField">UUID to check</label>
+                    <input class="form-control" type="text" id="uuidInputField" v-model.trim="text">
+                </div>
+            </form>
+
+            <div class="alert mt-3" role="alert" v-bind:class="isValid ? 'alert-success' : 'alert-warning'" v-show="text">{{validate()}}</div>
+        </div>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/uuid/8.3.1/uuid.min.js" crossorigin="anonymous"></script>
+
+<script>
+    new Vue({
+        el: "#generateApp",
+        data: {
+            uuidVersion: "4",
+            name: "",
+            namespace: "",
+            result: ""
+        },
+        methods: {
+            generate() {
+                switch (this.uuidVersion) {
+                    case "1":
+                        this.result = uuid.v1();
+                        break;
+                    case "3":
+                        this.result = uuid.v3(this.name, this.namespace);
+                        break;
+                    case "4":
+                        this.result = uuid.v4();
+                        break;
+                    case "5":
+                        this.result = uuid.v5(this.name, this.namespace);
+                        break;
+                    default:
+                        alert("Should never reach here, this is a bug: " + this.uuidVersion);
+                        break;
+                }
+            }
+        }
+    });
+
+    new Vue({
+        el: "#validateApp",
+        data: {
+            text: "",
+            isValid: false
+        },
+        methods: {
+            validate() {
+                if (!this.text)
+                    return;
+
+                return "UUID is " + ((this.isValid = uuid.validate(this.text)) ? "valid, and is version number " + uuid.version(this.text) : "invalid");
+            }
+        }
+    });
+</script>
+{% endraw %}
+{% endblock %}
