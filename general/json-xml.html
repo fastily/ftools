@@ -1,0 +1,75 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "json-xml" %}
+{% set desc = "convert JSON to XML and XML to JSON" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radioButtons" id="xmlToJSONButton" value="xml" v-model="processMode">
+                    <label class="form-check-label" for="xmlToJSONButton">XML to JSON</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radioButtons" id="jsonToXMLButton" value="json" v-model="processMode">
+                    <label class="form-check-label" for="jsonToXMLButton">JSON to XML</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="textInputField">The {{processMode.toUpperCase()}} to convert</label>
+                <textarea class="form-control" rows="15" id="textInputField" v-model.trim="text"></textarea>
+            </div>
+
+            <input type="button" value="Do it" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="!text">
+        </form>
+
+        <div class="card mt-4" v-show="result">
+            <div class="card-header">Result</div>
+            <div class="card-body">
+                <pre>{{result}}</pre>
+            </div>
+        </div>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+
+{% block scripts %}
+{% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/fast-xml-parser/3.17.1/parser.js" crossorigin="anonymous"></script>
+
+<script>
+    const jToXParser = new parser.j2xParser({ format: true });
+
+    new Vue({
+        el: "#app",
+        data: {
+            processMode: "xml",
+            text: "",
+            result: ""
+        },
+        methods: {
+            generate() {
+                if (this.processMode === "xml") {
+                    const r = parser.validate(this.text);
+                    this.result = r !== true ? `${r.err.code}: ${r.err.msg}  See line ${r.err.line}` : parser.parse(this.text);
+                }
+                else {
+                    try {
+                        this.result = '<?xml version="1.0"?>\n' + jToXParser.parse(JSON.parse(this.text));
+                    }
+                    catch (e) {
+                        this.result = e.message;
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endraw %}
+{% endblock %}

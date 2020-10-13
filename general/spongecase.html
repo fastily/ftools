@@ -1,0 +1,64 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "spongecase" %}
+{% set desc = "convert text to sPoNgEcAsE" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+	<div id="app">
+		<form>
+			<div class="form-group">
+				<label for="textInputField">Text to convert</label>
+				<textarea class="form-control" rows="15" id="textInputField" v-model.trim="text"></textarea>
+			</div>
+
+            <div class="form-check form-group">
+                <input class="form-check-input" type="checkbox" id="randomizeBox" v-model="randomize">
+                <label class="form-check-label" for="randomizeBox">Random casing</label>
+            </div>
+		</form>
+
+		<div class="card mt-4" v-show="text">
+			<div class="card-header">Result</div>
+			<div class="card-body">
+				<pre>{{procText()}}</pre>
+			</div>
+		</div>
+	</div>
+</section>
+{% endraw %}
+{% endblock %}
+
+
+{% block scripts %}
+{% raw %}
+<script>
+	new Vue({
+		el: "#app",
+		data: {
+            text: "",
+			randomize: false,
+		},
+		methods: {
+			procText() {
+				if (!this.text)
+					return "";
+
+                const t = this.text.toLowerCase();
+                let out = "";
+
+                if(this.randomize)
+                    for(let s of t)
+                        out += Math.random() > 0.5 ? s.toUpperCase() : s;
+                else
+                    for(let i = 0; i < t.length; i++)
+                        out += i % 2 ? t[i].toUpperCase() : t[i];
+                
+                return out;
+			}
+		}
+	});
+</script>
+{% endraw %}
+{% endblock %}
