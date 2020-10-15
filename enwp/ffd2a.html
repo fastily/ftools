@@ -11,10 +11,10 @@
             <div class="form-group">
                 <label for="textInputField">Files to generate <a href="https://en.wikipedia.org/wiki/Template:Ffd2a" target="_blank">Ffd2a</a> listings for</label>
                 <textarea class="form-control" rows="15" id="textInputField" v-model.trim="text"></textarea>
-                <small class="text-muted">One file per line, must start with "File:" prefix and exist on enwp.  Everything else will be ignored.</small>
+                <small class="text-muted">One file per line, must start with "File:" prefix and exist on enwp. Everything else will be ignored.</small>
             </div>
 
-            <input type="button" value="Generate" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning">
+            <input type="button" value="Generate" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="isRunning || !text">
             <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true" v-show="isRunning"></span>
         </form>
 
@@ -42,7 +42,9 @@
 
 {% raw %}
 <script type="module">
-    // import JSWiki from "/jswiki.js";
+    import JSWiki from "/jswiki.js";
+
+    const wiki = new JSWiki("en.wikipedia.org");
 
     new Vue({
         el: "#app",
@@ -54,7 +56,7 @@
             errorMessages: []
         },
         methods: {
-            generate() {
+            async generate() {
                 if (!this.text)
                     return;
 
@@ -62,20 +64,14 @@
                 this.result = "";
                 this.errorMessages = [];
 
-                const queries = this.text.split("\n").map(s => s.trim()).filter(s => s && s.startsWith("File:")).map(s => axios.get(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=revisions&formatversion=2&rvlimit=1&rvdir=newer&titles=${encodeURIComponent(s)}`));
+                Promise.all(this.text.split("\n").map(s => s.trim()).filter(s => s && s.startsWith("File:")).map(s => new Promise((resolve, reject) => wiki.revisions(s, 1, true).then(rl => resolve([s, rl]))))).then(values => {
+                    const results = [], errors = [];
 
-                Promise.all(queries).then(values => {
-                    const results = [];
-                    const errors = [];
-                    for (const response of values)
-                    {
-                        const page = response.data.query.pages[0];
-
-                        if(page.hasOwnProperty("missing"))
-                            errors.push(`${page.title} does not exist, omitting`);
+                    for (const [title, r] of values)
+                        if (r && r.length > 0)
+                            results.push(`{{subst:Ffd2a|${title.substring(5)}|multi=yes|uploader=${r[0].user}}}`);
                         else
-                            results.push(`{{subst:Ffd2a|${page.title.substring(5)}|multi=yes|uploader=${page.revisions[0].user}}}`);
-                    }
+                            errors.push(title + " does not exist, omitting");
 
                     this.isRunning = false;
                     this.result = results.join("\n");

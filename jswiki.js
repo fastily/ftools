@@ -85,10 +85,7 @@ class JSWiki {
         let cont = null;
         do {
             if (cont)
-                pl = {
-                    ...pl,
-                    ...cont
-                };
+                pl = { ...pl, ...cont };
 
             const response = await axios.get(this.apiEndpoint, { params: pl })
             for (const e of response.data.query.pages)
@@ -102,6 +99,49 @@ class JSWiki {
 
         return out;
     }
+
+    /**
+     * Gets the specified properties of one title, with the option to limit the total number of returned results and/or continuation queries.
+     * @param {Object} pl The parameter list to query Wikipedia with.
+     * @param {string} queryName The name of the query (e.g. "transcludedin", "pageprops").  This is also the key that results are returned under. 
+     * @param {string} title The title to query.
+     * @param {string} limitKey The name of the key used to specifiy the maximum number of elements to get via the API in one query.  Optional, set null to disable.
+     * @param {Number} maxResults The maximum total number of results to return.  Optional, set -1 to get all possible results from the API.  Ignored if limitKey is null.
+     * @param {function} fetchElement The method used to extract elements from individual JSON objects in the results array.
+     */
+    async singlePropCont(pl, queryName, title, limitKey = null, maxResults = -1, fetchElement = e => e.title) {
+        pl = {
+            prop: queryName,
+            titles: title,
+            ...wpApiQueryDefaults,
+            ...pl
+        };
+
+        if (limitKey)
+            pl[limitKey] = "max";
+
+        const out = [];
+        let cont;
+
+        do {
+            if (maxResults > 0)
+                pl[limitKey] = "" + Math.min(maxResults - out.length, 500);
+
+            if (cont)
+                pl = { ...pl, ...cont };
+
+            const response = await axios.get(this.apiEndpoint, { params: pl })
+            const qr = response.data?.query?.pages?.[0]?.[queryName]?.map(fetchElement);
+
+            if (qr)
+                out.push(...qr);
+
+            cont = response.data?.continue;
+        } while (cont && !(maxResults > 0 && out.length >= maxResults));
+
+        return out;
+    }
+
 
     /**
      * Performs a list API query, loops until all elements have been retrieved.
@@ -176,6 +216,21 @@ class JSWiki {
             pl["tinamespace"] = selectedNS.join("|");
 
         return await this.propCont(pl, "transcludedin", title);
+    }
+
+    /**
+     * Get revisions of a page.  Returns an empty list if the page does not exist.
+     * @param {string} title The title to get revisions for
+     * @param {Number} limit The maximum number of revisions to return.  Optional, set -1 to disable.
+     * @param {boolean} olderFirst Set true to cause older revisions to be loaded first.  The default behavior is to load newer revisions first.
+     */
+    async revisions(title, limit = -1, olderFirst = false) {
+        const pl = { "rvprop": "flags|comment|user|content|ids|timestamp" }
+
+        if (olderFirst)
+            pl["rvdir"] = "newer";
+
+        return await this.singlePropCont(pl, "revisions", title, "rvlimit", limit, e => e);
     }
 }
 
