@@ -13,11 +13,11 @@
 				<textarea class="form-control" rows="5" id="mainTextInput" v-model="inputText"></textarea>
 			</div>
 			<div class="form-group">
-				<label for="selectAlgBox">Select a <a href="https://en.wikipedia.org/wiki/Hash_function">hashing algorithim</a></label>
+				<label for="selectAlgBox">Select a <a href="https://en.wikipedia.org/wiki/Hash_function">hashing algorithm</a></label>
 				<select class="form-control" id="selectAlgBox" v-model="selectedAlg">
 					<option v-for="v in vals" :key="v.name" :value="v.name">{{v.name}} ({{v.type}})</option>
 				</select>
-				<small v-show="selectedAlg == 'keccak512'" class="text-muted">NB: Past versions of this tool erroneously referred to keccak512 as sha3-512</small>
+				<small class="form-text text-muted" v-show="selectedAlg == 'keccak512'">NB: Past versions of this tool erroneously referred to keccak512 as sha3-512</small>
 			</div>
 		</form>
 
@@ -37,24 +37,24 @@
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" crossorigin="anonymous"></script>
 
 <script>
-	new Vue({
-		el: "#app",
-		data: {
-			vals: [
-				{ name: "keccak512", type: "strong" },
-				{ name: "sha512", type: "strong" },
-				{ name: "sha384", type: "better" },
-				{ name: "sha256", type: "better" },
-				{ name: "sha1", type: "weak" },
-				{ name: "md5", type: "weak" }],
-			selectedAlg: "sha512",
-			inputText: "",
-			showResult: false
+	Vue.createApp({
+		data() {
+			return {
+				vals: [
+					{ name: "keccak512", type: "strong" },
+					{ name: "sha512", type: "strong" },
+					{ name: "sha384", type: "better" },
+					{ name: "sha256", type: "better" },
+					{ name: "sha1", type: "weak" },
+					{ name: "md5", type: "weak" }],
+				selectedAlg: "sha512",
+				inputText: "",
+				showResult: false
+			};
 		},
 		methods: {
 			doHash() {
-				if (!this.inputText)
-				{
+				if (!this.inputText) {
 					this.showResult = false;
 					return "";
 				}
@@ -63,23 +63,23 @@
 
 				switch (this.selectedAlg) {
 					case 'md5':
-						return CryptoJS.MD5(this.inputText)
+						return CryptoJS.MD5(this.inputText).toString();
 					case 'sha1':
-						return CryptoJS.SHA1(this.inputText)
+						return CryptoJS.SHA1(this.inputText).toString();
 					case 'sha256':
-						return CryptoJS.SHA256(this.inputText)
+						return CryptoJS.SHA256(this.inputText).toString();
 					case 'sha384':
-						return CryptoJS.SHA384(this.inputText)
+						return CryptoJS.SHA384(this.inputText).toString();
 					case 'sha512':
-						return CryptoJS.SHA512(this.inputText)
+						return CryptoJS.SHA512(this.inputText).toString();
 					case 'keccak512':
-						return CryptoJS.SHA3(this.inputText) // SHA3() refers to Keccak-512 in CryptoJS
+						return CryptoJS.SHA3(this.inputText).toString(); // SHA3() refers to Keccak-512 in CryptoJS
 					default:
 						return alert("Invalid option, should never reach here");
 				}
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

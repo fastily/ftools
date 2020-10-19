@@ -34,11 +34,12 @@
 <script>
 	const parser = new UAParser();
 
-	new Vue({
-		el: "#app",
-		data: {
-			text: "",
-			outputText: ""
+	Vue.createApp({
+		data() {
+			return {
+				text: "",
+				outputText: ""
+			};
 		},
 		methods: {
 			fillMyUA() {
@@ -48,7 +49,7 @@
 				this.outputText = parser.setUA(this.text).getResult();
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

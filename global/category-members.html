@@ -49,14 +49,15 @@
 
     const wiki = new JSWiki(defaultTargetWiki());
 
-    new Vue({
-        el: "#app",
-        data: {
-            text: "",
-            showResult: false,
-            result: "",
-            isRunning: false,
-            selectedNS: [],
+    Vue.createApp({
+        data() {
+            return {
+                text: "",
+                showResult: false,
+                result: "",
+                isRunning: false,
+                selectedNS: [],
+            };
         },
         components: {
             "ns-picker": nsPicker,
@@ -79,7 +80,7 @@
                 });
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

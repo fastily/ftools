@@ -41,14 +41,15 @@
 {% block scripts %}
 {% raw %}
 <script>
-	new Vue({
-		el: "#app",
-		data: {
-			minInt: 0,
-			maxInt: 100,
-			showResult: false,
-			count: 1,
-			result: ""
+	Vue.createApp({
+		data() {
+			return {
+				minInt: 0,
+				maxInt: 100,
+				showResult: false,
+				count: 1,
+				result: ""
+			};
 		},
 		methods: {
 			generate() {
@@ -61,7 +62,7 @@
 				this.showResult = true;
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

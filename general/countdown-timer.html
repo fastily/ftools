@@ -43,15 +43,16 @@
 {% block scripts %}
 {% raw %}
 <script>
-    new Vue({
-        el: "#app",
-        data: {
-            inputHours: 0,
-            inputMins: 0,
-            inputSecs: 0,
-            isRunning: false,
-            targetDate: null,
-            displayTS: ""
+    Vue.createApp({
+        data() {
+            return {
+                inputHours: 0,
+                inputMins: 0,
+                inputSecs: 0,
+                isRunning: false,
+                targetDate: null,
+                displayTS: ""
+            }
         },
         methods: {
             updateTimer() {
@@ -74,7 +75,7 @@
                 return Math.floor(n).toString().padStart(2, 0);
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

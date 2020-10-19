@@ -59,15 +59,16 @@
 		return minDrives > numHDD ? `Error: ${name} requires at least ${minDrives} drives` : generateMessage(name, (numHDD - parityDrives) * hddSize, parityDrives * hddSize, parityDrives, null);
 	}
 
-	new Vue({
-		el: "#app",
-		data: {
-			raidLevels: ["RAID0", "RAID1", "RAID4", "RAID5", "RAID6", "RAID-Z0", "RAID-Z", "RAID-Z2", "RAID-Z3"],
-			indentLevel: 1,
-			numHDD: 4,
-			hddSize: 4,
-			selectedRaidLevel: "",
-			showResult: false
+	Vue.createApp({
+		data() {
+			return {
+				raidLevels: ["RAID0", "RAID1", "RAID4", "RAID5", "RAID6", "RAID-Z0", "RAID-Z", "RAID-Z2", "RAID-Z3"],
+				indentLevel: 1,
+				numHDD: 4,
+				hddSize: 4,
+				selectedRaidLevel: "",
+				showResult: false
+			};
 		},
 		methods: {
 			calc() {
@@ -76,7 +77,7 @@
 
 				this.showResult = true;
 
-				if(this.hddSize == 0)
+				if (this.hddSize == 0)
 					return "Error: Hard Drive Size cannot be 0";
 
 				switch (this.selectedRaidLevel) {
@@ -103,7 +104,7 @@
 				}
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

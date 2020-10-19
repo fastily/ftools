@@ -34,11 +34,12 @@
 {% block scripts %}
 {% raw %}
 <script>
-	new Vue({
-		el: "#app",
-		data: {
-			indentLevel: 1,
-			text: ""
+	Vue.createApp({
+		data() {
+			return {
+				indentLevel: 1,
+				text: ""
+			};
 		},
 		methods: {
 			procText() {
@@ -53,7 +54,7 @@
 				}
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

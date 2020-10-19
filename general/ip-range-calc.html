@@ -19,7 +19,7 @@
 				</select>
 			</div>
 
-			<input type="button" value="Calculate!" class="btn btn-primary" v-on:click.prevent="calculate">
+			<input type="button" value="Calculate" class="btn btn-primary" v-on:click.prevent="calculate" :disabled="!inputText">
 		</form>
 
 		<div class="card mt-4" v-show="showResult">
@@ -38,7 +38,6 @@
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/ipaddr.js/1.9.1/ipaddr.min.js" crossorigin="anonymous"></script>
 
 <script>
-
 	function binaryFillTop(num, size) {
 		let out = 0;
 		for (i = size - 1; i >= size - num; i--)
@@ -60,14 +59,15 @@
 		return addr;
 	}
 
-	new Vue({
-		el: "#app",
-		data: {
-			inputText: "",
-			selectedIPType: "",
-			resultText: "",
-			showBigRangeWarning: false,
-			showResult: false
+	Vue.createApp({
+		data() {
+			return {
+				inputText: "",
+				selectedIPType: "4",
+				resultText: "",
+				showBigRangeWarning: false,
+				showResult: false
+			};
 		},
 		methods: {
 			calculate() {
@@ -93,7 +93,7 @@
 				let addrs = [];
 				for (i = 0; i < ipL.length; i++) {
 					if (!protocol.isValid(ipL[i]))
-						return alert("Error: '" + ipL[i] + "' is not a valid IP address in this context.  Please fix before proceeding");
+						return alert(`ERROR: '${ipL[i]}' is not a valid IPv${this.selectedIPType} address, please fix this before proceeding.`);
 
 					addrs.push(ipaddr.parse(ipL[i]));
 				}
@@ -118,7 +118,7 @@
 				this.showResult = true;
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

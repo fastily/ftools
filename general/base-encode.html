@@ -36,14 +36,16 @@
 {% block scripts %}
 {% raw %}
 <script>
-	new Vue({
-		el: "#app",
-		data: {
-			actions: ["encode", "decode"],
-			selectedAlg: "encode",
-			inputText: "",
-			encoder: new TextEncoder(),
-			decoder: new TextDecoder()
+	const encoder = new TextEncoder();
+	const decoder = new TextDecoder();
+
+	Vue.createApp({
+		data() {
+			return {
+				actions: ["encode", "decode"],
+				selectedAlg: "encode",
+				inputText: ""
+			};
 		},
 		methods: {
 			procText() {
@@ -51,14 +53,14 @@
 					return "";
 				try {
 					if (this.selectedAlg === "encode")
-						return window.btoa(String.fromCharCode(...this.encoder.encode(this.inputText)));
+						return window.btoa(String.fromCharCode(...encoder.encode(this.inputText)));
 					else {
 						const decoded = window.atob(this.inputText);
 						const bytes = new Uint8Array(decoded.length);
 						for (let i = 0; i < bytes.length; i++)
 							bytes[i] = decoded.charCodeAt(i);
 
-						return this.decoder.decode(bytes);
+						return decoder.decode(bytes);
 					}
 				}
 				catch (e) {
@@ -67,7 +69,7 @@
 				}
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 
 {% endraw %}

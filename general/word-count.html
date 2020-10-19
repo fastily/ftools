@@ -33,10 +33,11 @@
 {% block scripts %}
 {% raw %}
 <script>
-	new Vue({
-		el: "#app",
-		data: {
-			text: ""
+	Vue.createApp({
+		data() {
+			return {
+				text: ""
+			};
 		},
 		computed: {
 			charCount() {
@@ -49,7 +50,7 @@
 				return this.text ? this.text.split("\n").length : 0;
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

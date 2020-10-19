@@ -48,17 +48,18 @@
 {% block scripts %}
 {% raw %}
 <script>
-    new Vue({
-        el: "#app",
-        data: {
-            findText: "",
-            regexFlags: "",
-            treatAsRegex: false,
-            replaceText: "",
-            text: "",
-            findTextIsInvalid: false,
-            showResult: false,
-            resultMessage: ""
+    Vue.createApp({
+        data() {
+            return {
+                findText: "",
+                regexFlags: "",
+                treatAsRegex: false,
+                replaceText: "",
+                text: "",
+                findTextIsInvalid: false,
+                showResult: false,
+                resultMessage: ""
+            };
         },
         methods: {
             procText() {
@@ -79,7 +80,7 @@
                 this.showResult = true;
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

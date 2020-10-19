@@ -46,14 +46,15 @@
 
     const wiki = new JSWiki("en.wikipedia.org");
 
-    new Vue({
-        el: "#app",
-        data: {
-            text: "",
-            showResult: false,
-            result: "",
-            isRunning: false,
-            errorMessages: []
+    Vue.createApp({
+        data() {
+            return {
+                text: "",
+                showResult: false,
+                result: "",
+                isRunning: false,
+                errorMessages: []
+            };
         },
         methods: {
             generate() {
@@ -80,7 +81,7 @@
                 });
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

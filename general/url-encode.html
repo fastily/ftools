@@ -44,12 +44,13 @@
 {% block scripts %}
 {% raw %}
 <script>
-    new Vue({
-        el: "#app",
-        data: {
-            processMode: "encode",
-            text: "",
-            treatAsURL: false,
+    Vue.createApp({
+        data() {
+            return {
+                processMode: "encode",
+                text: "",
+                treatAsURL: false,
+            };
         },
         methods: {
             processText() {
@@ -59,7 +60,7 @@
                 return this.processMode === "encode" ? (this.treatAsURL ? encodeURI(this.text) : encodeURIComponent(this.text)) : (this.treatAsURL ? decodeURI(this.text) : decodeURIComponent(this.text));
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

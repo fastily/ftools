@@ -22,6 +22,7 @@
             <div class="form-group">
                 <label for="textInputField">The {{processMode.toUpperCase()}} to convert</label>
                 <textarea class="form-control" rows="15" id="textInputField" v-model.trim="text"></textarea>
+                <small class="form-text text-muted" v-show="processMode === 'json'">Warning: JSON arrays cannot be translated to XML</small>
             </div>
 
             <input type="button" value="Do it" class="btn btn-primary" v-on:click.prevent="generate" v-bind:disabled="!text">
@@ -46,12 +47,13 @@
 <script>
     const jToXParser = new parser.j2xParser({ format: true });
 
-    new Vue({
-        el: "#app",
-        data: {
-            processMode: "xml",
-            text: "",
-            result: ""
+    Vue.createApp({
+        data() {
+            return {
+                processMode: "xml",
+                text: "",
+                result: ""
+            };
         },
         methods: {
             generate() {
@@ -59,17 +61,16 @@
                     const r = parser.validate(this.text);
                     this.result = r !== true ? `${r.err.code}: ${r.err.msg}  See line ${r.err.line}` : parser.parse(this.text);
                 }
-                else {
+                else
                     try {
                         this.result = '<?xml version="1.0"?>\n' + jToXParser.parse(JSON.parse(this.text));
                     }
                     catch (e) {
                         this.result = e.message;
                     }
-                }
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

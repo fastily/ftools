@@ -47,14 +47,15 @@
 {% block scripts %}
 {% raw %}
 <script>
-	new Vue({
-		el: "#app",
-		data: {
-			text1: "",
-			text2: "",
-			mergeOption: "union",
-			result: "",
-			showResult: false
+	Vue.createApp({
+		data() {
+			return {
+				text1: "",
+				text2: "",
+				mergeOption: "union",
+				result: "",
+				showResult: false
+			};
 		},
 		methods: {
 			procText() {
@@ -74,7 +75,7 @@
 				this.result = out.join("\n");
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

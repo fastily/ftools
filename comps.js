@@ -2,7 +2,7 @@ import JSWiki from "/jswiki.js";
 import { defaultTargetWiki } from "/utils.js";
 
 export const nsPicker = {
-    props: ["value"],
+    props: ["modelValue"],
     data() {
         return {
             content: this.value,
@@ -18,7 +18,7 @@ export const nsPicker = {
     template: `
     <div class="form-group">
         <label for="nsFilterDropdown">Restrict results to these namespaces (optional)</label>
-        <select class="form-control selectpicker" id="nsFilterDropdown" v-model="content" v-on:change="$emit('input', content)" multiple>
+        <select class="form-control selectpicker" id="nsFilterDropdown" v-model="content" v-on:change="$emit('update:modelValue', content)" multiple>
             <option v-for="e in nsFilter" :value="e.id" :key="e.name">{{e.name}}</option>
         </select>
     </div>`

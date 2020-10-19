@@ -39,12 +39,12 @@
 {% block scripts %}
 {% raw %}
 <script>
-    new Vue({
-        el: "#app",
-        data: {
+	Vue.createApp({
+		data() {
+			return {
             text: "",
             processMode: "diff",
-        },
+        };},
         methods: {
             processText() {
                 if (!this.text)
@@ -64,7 +64,7 @@
                 return this.processMode === "permalink" ? `[[Special:PermanentLink/${url.searchParams.get("oldid")}${url.hash || ""}]]` : `[[Special:Diff/${url.searchParams.get("oldid")}${url.searchParams.has("diff") ? "/" + url.searchParams.get("diff") : ""}]]`;
             }
         }
-    });
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

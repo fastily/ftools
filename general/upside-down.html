@@ -118,13 +118,14 @@
 
     const wl = new Set([" ", "\n"])
 
-    new Vue({
-        el: "#app",
-        data: {
-            text: "",
-            badChars: new Set(),
-            hasError: false,
-            disableReverse: false
+    Vue.createApp({
+        data() {
+            return {
+                text: "",
+                badChars: new Set(),
+                hasError: false,
+                disableReverse: false
+            };
         },
         computed: {
             flippedText() {
@@ -146,7 +147,7 @@
                 return this.disableReverse ? out : out.split("").reverse().join("");
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}

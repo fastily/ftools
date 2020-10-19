@@ -34,11 +34,12 @@
 {% block scripts %}
 {% raw %}
 <script>
-	new Vue({
-		el: "#app",
-		data: {
-			text: "",
-			randomize: false,
+	Vue.createApp({
+		data() {
+			return {
+				text: "",
+				randomize: false,
+			};
 		},
 		methods: {
 			procText() {
@@ -58,7 +59,7 @@
 				return out;
 			}
 		}
-	});
+	}).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}
