@@ -27,7 +27,7 @@
             </div>
         </form>
 
-        <div class="card mt-4" v-show="showResult">
+        <div class="card mt-4" v-show="text">
             <div class="card-header">Result</div>
             <div class="card-body">
                 <pre>{{procText()}}</pre>
@@ -49,20 +49,13 @@
                 nsPrefix: "",
                 useColonPrefix: false,
                 useOLPrefix: false,
-                showResult: false
             };
         },
         methods: {
             procText() {
-                if (!this.text) {
-                    this.showResult = false;
-                    return;
-                }
-
                 const linkPrefix = this.useColonPrefix ? ":" : "";
                 const listPrefix = this.useOLPrefix ? "#" : "*";
 
-                this.showResult = true;
                 return this.text.split("\n").map(s => s.trim()).filter(s => s).map(s => `${listPrefix}[[${linkPrefix}${this.nsPrefix}${s}]]`).join("\n");
             }
         }
