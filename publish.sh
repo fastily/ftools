@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#: Generates and publsihes ftools to toolforge.
+#: Generates and publishes ftools to toolforge.
 #:
 #: PRECONDITION:
 #: 		1) jinja2html is installed
@@ -10,7 +10,7 @@
 
 cd "${0%/*}" &> /dev/null
 
-if ! command -v jinja2html; then
+if ! command -v jinja2html &> /dev/null; then
     printf "jinja2html is not available.  Please either install it or remember to start your virtualenv :)\n"
     exit
 fi
