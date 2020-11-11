@@ -1,0 +1,77 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "luhn-validator" %}
+{% set desc = "validate numbers with the Luhn algorithim" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <label for="inputNumberField">Number to validate</label>
+                <input type="text" id="inputNumberField" class="form-control form-control-lg" :class="inputBoxClasses" v-model.trim="inputNum" v-on:input="luhn">
+                <div :class="feedbackClasses" v-show="inputNum">{{message}}</div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                isValid: false,
+                inputNum: "",
+                message: ""
+            };
+        },
+        computed: {
+            inputBoxClasses() {
+                return this.inputNum ? [`is-${this.isValid ? "" : "in"}valid`] : [];
+            },
+            feedbackClasses() {
+                return this.inputNum ? [`${this.isValid ? "" : "in"}valid-feedback`] : [];
+            }
+        },
+        methods: {
+            // luhn algorithim adapted from https://en.wikipedia.org/w/index.php?title=Luhn_algorithm&oldid=987681738#JavaScript_implementation
+            luhn() {
+                if (isNaN(this.inputNum)) {
+                    this.isValid = false;
+                    this.message = "integers only"
+                    return;
+                }
+
+                let sum = parseInt(this.inputNum.charAt(this.inputNum.length - 1));
+
+                for (let i = 0; i < this.inputNum.length - 1; i++) {
+                    let value = parseInt(this.inputNum.charAt(i));
+
+                    if (i % 2 === 0)
+                        value *= 2;
+
+                    if (value > 9)
+                        value -= 9;
+
+                    sum += value;
+                }
+
+                if (sum % 10 === 0) {
+                    this.isValid = true;
+                    this.message = "valid luhn number";
+                }
+                else {
+                    this.isValid = false;
+                    this.message = "invalid luhn number";
+                }
+            }
+        }
+    }).mount("#app");
+</script>
+{% endraw %}
+{% endblock %}
