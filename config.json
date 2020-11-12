@@ -5,6 +5,7 @@
             "binary-calc": "Convert integers to/from binary/octal/decimal/hex",
             "countdown-timer": "A simple countdown timer",
             "find-and-replace": "Find and replace text in text",
+            "html-entity": "Encode/Decode text to/from html entities",
             "ip-range-calc": "Calculates the smallest CIDR block encompassing a given list of IP addresses",
             "json-format": "Pretty-print JSON",
             "json-xml": "Convert JSON to XML and XML to JSON",
