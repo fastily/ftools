@@ -25,7 +25,7 @@
                                 </div>
                             </div>
                             <input type="button" value="Save Settings" class="btn btn-primary" v-on:click.prevent="save">
-                            <input type="button" value="Restore Defaults" class="btn btn-secondary" v-on:click.prevent="restoreDefaults">
+                            <input type="button" value="Restore Defaults" class="btn btn-secondary ml-2" v-on:click.prevent="restoreDefaults">
                         </form>
                     </div>
                 </div>
@@ -45,14 +45,15 @@
     import JSWiki from "/jswiki.js";
     import { defaultTargetWiki } from "/utils.js";
 
-    new Vue({
-        el: "#app",
-        data: {
-            targetWiki: "",
-            allWikis: null,
-            targetWikiInvalid: false,
-            settingsUnsupported: false,
-            showMessage: false
+    Vue.createApp({
+        data() {
+            return {
+                targetWiki: "",
+                allWikis: null,
+                targetWikiInvalid: false,
+                settingsUnsupported: false,
+                showMessage: false
+            }
         },
         created() {
 
@@ -91,7 +92,7 @@
                 this.targetWiki = defaultTargetWiki();
             }
         }
-    });
+    }).mount("#app");
 </script>
 {% endraw %}
 {% endblock %}
