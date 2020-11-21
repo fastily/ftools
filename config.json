@@ -15,6 +15,7 @@
             "password-strength": "Estimates the strength of a passphrase",
             "raid-calc": "Calculates RAID space efficiency",
             "random-number": "Secure random number generator",
+            "rotate-image": "Rotate jpg/png files",
             "spongecase": "Convert text to SpongeCase",
             "text2hash": "Calcluates the hash (md5, sha1, sha2, keccak) of a string",
             "union-intersection": "Perform a union or intersection on two sets of lines/strings",

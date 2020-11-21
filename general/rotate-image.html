@@ -1,0 +1,93 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "rotate-image" %}
+{% set desc = "rotate jpg/png files" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <label for="combineSecondFileInput">Target File</label>
+                <div class="custom-file" id="combineSecondFileInput">
+                    <input type="file" class="custom-file-input" id="combineSecondFile" accept=".png, .jpg, .jpeg" v-on:change="fileSelected($event)">
+                    <label class="custom-file-label" for="combineSecondFile">Select an image...</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="selectDegrees">How many degrees to rotate? (counterclockwise)</label>
+                <select class="form-control" id="selectDegrees" v-model="degrees">
+                    <option v-for="deg in ['90', '180', '270']" :key="deg" :value="deg">{{deg}}&deg;</option>
+                </select>
+            </div>
+
+            <input type="button" value="Do it" class="btn btn-primary" v-on:click.prevent="procFile" v-bind:disabled="isRunning || !targetFile">
+            <span class="ml-2 spinner-border spinner-border-sm text-primary" role="status" v-show="isRunning"></span>
+        </form>
+
+        <div class="alert alert-success mt-4" role="alert" v-show="resultMessage">{{resultMessage}}</div>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/bs-custom-file-input/1.3.4/bs-custom-file-input.min.js" crossorigin="anonymous"></script>
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/jimp/0.16.1/jimp.js" crossorigin="anonymous"></script>
+<script>
+    $(document).ready(() => bsCustomFileInput.init());
+
+    async function fileAsJimp(file) {
+        return await Jimp.read(await new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = () => reject("unable to read file");
+            fr.readAsArrayBuffer(file);
+        }));
+    }
+
+    function downloadBlob(data, mtype, fileName) {
+        const url = URL.createObjectURL(new Blob([data], { type: mtype }));
+
+        const a = document.createElement('a')
+        a.href = url
+        a.download = fileName
+        document.body.appendChild(a)
+        a.style.display = 'none'
+        a.click()
+        a.remove()
+
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    Vue.createApp({
+        data() {
+            return {
+                targetFile: null,
+                degrees: "90",
+                resultMessage: "",
+                isRunning: false
+            };
+        },
+        methods: {
+            fileSelected(e) {
+                this.targetFile = e.target.files[0];
+            },
+            async procFile() {
+                this.isRunning = true;
+
+                const img = await fileAsJimp(this.targetFile);
+                img.rotate(parseInt(this.degrees));
+                downloadBlob(await img.getBufferAsync(Jimp.AUTO), img.getMIME(), this.targetFile.name);
+
+                this.isRunning = false;
+                this.resultMessage = `Rotated '${this.targetFile.name}' by ${this.degrees}°`;
+            }
+        }
+    }).mount("#app");
+</script>
+{% endraw %}
+{% endblock %}
