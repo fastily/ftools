@@ -13,6 +13,7 @@
             "levenshtein-distance": "Calculate the Levenshtein distance between two strings",
             "luhn-validator": "Validate numbers with the Luhn algorithim",
             "password-strength": "Estimates the strength of a passphrase",
+            "punycode": "Encode/Decode text with punycode",
             "raid-calc": "Calculates RAID space efficiency",
             "random-number": "Secure random number generator",
             "rotate-image": "Rotate jpg/png files",

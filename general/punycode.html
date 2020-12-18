@@ -1,0 +1,67 @@
+{% extends 'templates/tool-base.html' %}
+
+{% set title = "punycode" %}
+{% set desc = "Encode/Decode text with punycode" %}
+
+{% block tool %}
+{% raw %}
+<section class="container">
+    <div id="app">
+        <form>
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radioButtons" id="encodeButton" value="encode" v-model="processMode">
+                    <label class="form-check-label" for="encodeButton">Encode</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="radioButtons" id="decodeButton" value="decode" v-model="processMode">
+                    <label class="form-check-label" for="decodeButton">Decode</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mainTextInput">Text to process</label>
+                <textarea class="form-control" rows="5" id="mainTextInput" v-model="text"></textarea>
+            </div>
+
+            <div class="form-check form-group">
+                <input class="form-check-input" type="checkbox" id="treatAsDomainOrEmailBox" v-model="treatAsDomain">
+                <label class="form-check-label" for="treatAsDomainOrEmailBox">Treat above text as a domain/email address</a></label>
+            </div>
+        </form>
+
+        <div class="card mt-4" v-show="text">
+            <div class="card-header">{{processMode.charAt(0).toUpperCase() + processMode.slice(1)}}d text</div>
+            <div class="card-body">
+                <pre>{{processText()}}</pre>
+            </div>
+        </div>
+    </div>
+</section>
+{% endraw %}
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/punycode/1.4.1/punycode.min.js"></script>
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                processMode: "encode",
+                text: "",
+                treatAsDomain: false
+            };
+        },
+        methods: {
+            processText() {
+                if (!this.text)
+                    return "";
+
+                return this.processMode === "encode" ? (this.treatAsDomain ? punycode.toASCII(this.text) : punycode.encode(this.text)) : (this.treatAsDomain ? punycode.toUnicode(this.text) : punycode.decode(this.text));
+            }
+        }
+    }).mount("#app");
+</script>
+{% endraw %}
+{% endblock %}
