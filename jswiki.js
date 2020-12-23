@@ -44,7 +44,6 @@ class JSWiki {
         return out;
     }
 
-
     /**
      * Gets the site matrix for wiki farm the Wiki represented by this JSWiki is part of.
      */
