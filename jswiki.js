@@ -24,48 +24,6 @@ class JSWiki {
     }
 
     /**
-     * Lists all namespaces on enwp
-     */
-    async listNamespaces() {
-        const response = await axios.get(this.apiEndpoint, {
-            params: {
-                ...wpApiQueryDefaults,
-                meta: "siteinfo",
-                siprop: "namespaces"
-            }
-        });
-
-        const out = [{ name: "(article)", id: "0" }];
-
-        for (const [k, v] of Object.entries(response.data.query.namespaces))
-            if (v.id > 0)
-                out.push({ name: v.name, id: k });
-
-        return out;
-    }
-
-    /**
-     * Gets the site matrix for wiki farm the Wiki represented by this JSWiki is part of.
-     */
-    async siteMatrix() {
-        const response = await axios.get(this.apiEndpoint, {
-            params: {
-                ...wpApiQueryDefaults,
-                action: "sitematrix",
-            }
-        });
-
-        const out = new Set(["commons.wikimedia.org", "meta.wikimedia.org", "species.wikimedia.org", "test.wikipedia.org", "www.wikidata.org"]);
-        for (const [k, v] of Object.entries(response.data.sitematrix))
-            if (parseInt(k) && v.site)
-                for (const e of v.site)
-                    if (!e.closed)
-                        out.add(new URL(e.url).hostname);
-
-        return out;
-    }
-
-    /**
      * Performs a prop API query, loops until all elements have been retrieved.  Results are returned in a map keyed by title.
      * @param {Object} pl The parameter list to query Wikipedia with
      * @param {string} queryName The name of the query (e.g. "transcludedin", "pageprops").  This is also the key that results are returned under.
@@ -170,6 +128,73 @@ class JSWiki {
 
             cont = "continue" in response.data ? response.data.continue : null;
         } while (cont)
+
+        return out;
+    }
+
+    /**
+     * Performs a meta query, and provides a hook to process the results.
+     * @param {Object} pl The parameter list to query Wikipedia with
+     * @param {string} queryName The name of the meta query (e.g. "userinfo", "namespaces").  This is also the key that results are returned under.
+     * @param {Function} fetchElements The method used to extract element(s) from the results of the query.
+     */
+    async meta(pl, queryName, fetchElements) {
+        const response = await axios.get(this.apiEndpoint, {
+            params: {
+                ...wpApiQueryDefaults,
+                ...pl,
+                meta: queryName
+            }
+        });
+
+        return fetchElements(response.data.query[queryName])
+    }
+
+    /**
+     * Gets the site matrix for wiki farm the Wiki represented by this JSWiki is part of.
+     */
+    async siteMatrix() {
+        const response = await axios.get(this.apiEndpoint, {
+            params: {
+                ...wpApiQueryDefaults,
+                action: "sitematrix",
+            }
+        });
+
+        const out = new Set(["commons.wikimedia.org", "meta.wikimedia.org", "species.wikimedia.org", "test.wikipedia.org", "www.wikidata.org"]);
+        for (const [k, v] of Object.entries(response.data.sitematrix))
+            if (parseInt(k) && v.site)
+                for (const e of v.site)
+                    if (!e.closed)
+                        out.add(new URL(e.url).hostname);
+
+        return out;
+    }
+
+    /**
+     * Gets the user we are currently logged in as.  If not logged in, then returns the external-facing IP address of the requester.
+     */
+    async whoami() {
+        return await this.meta({}, "userinfo", e => e["name"])
+    }
+
+    /**
+     * Lists all namespaces on enwp
+     */
+    async listNamespaces() { // TODO: convert to use meta()
+        const response = await axios.get(this.apiEndpoint, {
+            params: {
+                ...wpApiQueryDefaults,
+                meta: "siteinfo",
+                siprop: "namespaces"
+            }
+        });
+
+        const out = [{ name: "(article)", id: "0" }];
+
+        for (const [k, v] of Object.entries(response.data.query.namespaces))
+            if (v.id > 0)
+                out.push({ name: v.name, id: k });
 
         return out;
     }

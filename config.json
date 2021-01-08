@@ -25,6 +25,7 @@
             "url-encode": "Encode/Decode URI/URLs",
             "user-agent": "Parse browser user agents",
             "uuid": "Generate and validate uuids",
+            "what-is-my-ip": "Show your IP address",
             "word-count": "Counts the number of characters, words, and lines in a body of text"
         },
         "enwp": {
