@@ -87,7 +87,7 @@
 					cnt = 128;
 				}
 
-				let ipL = this.inputText.split("\n").map(s => s.trim()).filter(ip => ip);
+				let ipL = this.inputText.split("\n").map(s => s.replace(/[\u200B-\u200F]/, "").trim()).filter(ip => ip);
 
 				// validate and parse IP addresses from user input
 				let addrs = [];
