@@ -42,10 +42,12 @@
 
 {% block scripts %}
 {% raw %}
-<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/fast-xml-parser/3.17.1/parser.js" crossorigin="anonymous"></script>
+<script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/fast-xml-parser/4.0.1/fxparser.js" crossorigin="anonymous"></script>
 
 <script>
-    const jToXParser = new parser.j2xParser({ format: true });
+    const options = { format: true }
+    const parser = new fxparser.XMLParser(options, true);
+    const builder = new fxparser.XMLBuilder(options);
 
     Vue.createApp({
         data() {
@@ -58,12 +60,12 @@
         methods: {
             generate() {
                 if (this.processMode === "xml") {
-                    const r = parser.validate(this.text);
+                    const r = fxparser.XMLValidator.validate(this.text);
                     this.result = r !== true ? `${r.err.code}: ${r.err.msg}  See line ${r.err.line}` : parser.parse(this.text);
                 }
                 else
                     try {
-                        this.result = '<?xml version="1.0"?>\n' + jToXParser.parse(JSON.parse(this.text));
+                        this.result = '<?xml version="1.0"?>\n' + builder.build(JSON.parse(this.text));
                     }
                     catch (e) {
                         this.result = e.message;
