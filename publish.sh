@@ -15,4 +15,4 @@ if ! command -v jinja2html &> /dev/null; then
     exit
 fi
 
-jinja2html --generate && scp -r out/* toolforge:/data/project/ftools/public_html
+jinja2html && scp -r out/* toolforge:/data/project/ftools/public_html
