@@ -5,19 +5,24 @@
 
 {% block tool %}
 {% raw %}
-<section class="container">
+<section class="container mb-5">
 	<div id="app">
 		<form>
-			<div class="form-group">
+			<div class="form-group mb-4">
 				<label for="mainTextInput">List the IP addresses below (one per line)</label>
 				<textarea class="form-control" rows="7" id="mainTextInput" v-model.trim="inputText"></textarea>
 			</div>
-			<div class="form-group">
-				<label for="selectIpType">What kind of IP addresses are these?</label>
-				<select class="form-control" id="selectIpType" v-model="selectedIPType">
-					<option v-for="ipType in ['4', '6']" :key="ipType" :value="ipType">IPv{{ipType}}</option>
-				</select>
-			</div>
+			<fieldset class="form-group mb-4">
+				<legend class="col-form-label">What kind of IP addresses are these?</legend>
+				<div class="form-check">
+					<input class="form-check-input" type="radio" name="ipv4Radio" id="exampleRadios1" value="4" v-model="selectedIPType">
+					<label class="form-check-label" for="ipv4Radio">IPv4</label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="radio" name="ipv6Radio" id="exampleRadios2" value="6" v-model="selectedIPType">
+					<label class="form-check-label" for="ipv6Radio">IPv6</label>
+				</div>
+			</fieldset>
 
 			<input type="button" value="Calculate" class="btn btn-primary" v-on:click.prevent="calculate" :disabled="!inputText">
 		</form>
@@ -38,25 +43,19 @@
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/ipaddr.js/2.0.1/ipaddr.min.js" crossorigin="anonymous"></script>
 
 <script>
-	function binaryFillTop(num, size) {
-		let out = 0;
-		for (i = size - 1; i >= size - num; i--)
-			out += 2 ** i;
-		return out;
-	}
+	function cidrFor(addr, prefix) {
+		let mask = [], addrBytes = addr.toByteArray();
 
-	function normalizeCIDR(addr, cidr, numBits) {
-		let mask = Array(addr.length).fill(0);
-		let fillCnt = Math.floor(cidr / numBits);
-		mask.fill(binaryFillTop(numBits, numBits), 0, fillCnt);
+		for (let i = 0, cnt = prefix, n; i < addrBytes.length; i++) {
+			n = Math.min(cnt, 0x8);
+			mask.push(0x100 - 2 ** (0x8 - n));
+			cnt -= n;
+		}
 
-		if (fillCnt < mask.length)
-			mask[fillCnt] = binaryFillTop(cidr % numBits, numBits);
+		for (let i = 0; i < addrBytes.length; i++)
+			addrBytes[i] &= mask[i];
 
-		for (i = 0; i < addr.length; i++)
-			addr[i] &= mask[i];
-
-		return addr;
+		return `${ipaddr.fromByteArray(addrBytes).toString()}/${prefix}`;
 	}
 
 	Vue.createApp({
@@ -108,13 +107,7 @@
 				if (ipaddr.IPv4 === protocol && cnt < 16 || ipaddr.IPv6 === protocol && cnt < 19)
 					this.showBigRangeWarning = true;
 
-				// normalize output
-				if (ipaddr.IPv4 === protocol)
-					this.resultText = ipaddr.fromByteArray(normalizeCIDR(addrs[0].toByteArray(), cnt, 8)).toString() + "/" + cnt;
-				else
-					// normalizeCIDR(addr, cnt, 16); // IPv6 parsing is broken in ipaddr.js, so retain old behavior
-					this.resultText = addrs[0].toString() + "/" + cnt;
-
+				this.resultText = cidrFor(addrs[0], cnt);
 				this.showResult = true;
 			}
 		}
