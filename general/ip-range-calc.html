@@ -72,29 +72,15 @@
 			calculate() {
 				this.showBigRangeWarning = false;
 
-				if (!this.inputText || !this.selectedIPType)
-					return alert("Error: Please fill out all fields!");
-
-				let protocol, cnt;
-				if (this.selectedIPType === "4") {
-					protocol = ipaddr.IPv4;
-					cnt = 32;
-				}
-				else  // this.selectedIPType === "6"
-				{
-					protocol = ipaddr.IPv6;
-					cnt = 128;
-				}
-
-				let ipL = this.inputText.split("\n").map(s => s.replace(/[\u200B-\u200F]/, "").trim()).filter(ip => ip);
+				let [protocol, cnt] = this.selectedIPType === "4" ? [ipaddr.IPv4, 32] : [ipaddr.IPv6, 128]
 
 				// validate and parse IP addresses from user input
-				let addrs = [];
-				for (i = 0; i < ipL.length; i++) {
-					if (!protocol.isValid(ipL[i]))
-						return alert(`ERROR: '${ipL[i]}' is not a valid IPv${this.selectedIPType} address, please fix this before proceeding.`);
+				const addrs = [];
+				for (const ip of this.inputText.split("\n").map(s => s.replace(/[\u200B-\u200F]/, "").trim()).filter(ip => ip)) {
+					if (!protocol.isValid(ip))
+						return alert(`ERROR: "${ip}" is not a valid IPv${this.selectedIPType} address, please fix this before proceeding.`);
 
-					addrs.push(ipaddr.parse(ipL[i]));
+					addrs.push(ipaddr.parse(ip));
 				}
 
 				// count backwards until we get a CIDR match
