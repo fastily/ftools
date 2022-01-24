@@ -43,21 +43,6 @@
 <script src="https://tools-static.wmflabs.org/cdnjs/ajax/libs/ipaddr.js/2.0.1/ipaddr.min.js" crossorigin="anonymous"></script>
 
 <script>
-	function cidrFor(addr, prefix) {
-		let mask = [], addrBytes = addr.toByteArray();
-
-		for (let i = 0, cnt = prefix, n; i < addrBytes.length; i++) {
-			n = Math.min(cnt, 0x8);
-			mask.push(0x100 - 2 ** (0x8 - n));
-			cnt -= n;
-		}
-
-		for (let i = 0; i < addrBytes.length; i++)
-			addrBytes[i] &= mask[i];
-
-		return `${ipaddr.fromByteArray(addrBytes).toString()}/${prefix}`;
-	}
-
 	Vue.createApp({
 		data() {
 			return {
@@ -71,12 +56,11 @@
 		methods: {
 			calculate() {
 				this.showBigRangeWarning = false;
-
-				let [protocol, cnt] = this.selectedIPType === "4" ? [ipaddr.IPv4, 32] : [ipaddr.IPv6, 128]
+				let [protocol, cnt, warningThreshold] = this.selectedIPType === "4" ? [ipaddr.IPv4, 32, 16] : [ipaddr.IPv6, 128, 19];
 
 				// validate and parse IP addresses from user input
 				const addrs = [];
-				for (const ip of this.inputText.split("\n").map(s => s.replace(/[\u200B-\u200F]/, "").trim()).filter(ip => ip)) {
+				for (const ip of this.inputText.split("\n").map(s => s.replace(/[\u200B-\u200F]/, "").trim()).filter(s => s)) {
 					if (!protocol.isValid(ip))
 						return alert(`ERROR: "${ip}" is not a valid IPv${this.selectedIPType} address, please fix this before proceeding.`);
 
@@ -84,16 +68,21 @@
 				}
 
 				// count backwards until we get a CIDR match
-				if (addrs.length > 1)
-					for (i = 1; i < addrs.length; i++)
-						while (!addrs[i].match(addrs[0], cnt) && cnt > 0)
-							cnt--;
+				const first = addrs[0];
+				for (const ip of addrs.slice(1))
+					while (!ip.match(first, cnt) && cnt)
+						cnt--;
 
 				// show warning for big ranges
-				if (ipaddr.IPv4 === protocol && cnt < 16 || ipaddr.IPv6 === protocol && cnt < 19)
+				if (cnt < warningThreshold)
 					this.showBigRangeWarning = true;
 
-				this.resultText = cidrFor(addrs[0], cnt);
+				// apply appropriate subnet mask to first IP address
+				const addrBytes = first.toByteArray(), mask = protocol.subnetMaskFromPrefixLength(cnt).toByteArray();
+				for (let i = 0; i < mask.length; i++)
+					addrBytes[i] &= mask[i];
+
+				this.resultText = `${ipaddr.fromByteArray(addrBytes).toString()}/${cnt}`
 				this.showResult = true;
 			}
 		}
